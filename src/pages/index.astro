@@ -1,11 +1,180 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Placeholder content for now
+const title = "Kodingus - The Creative Generalist";
+const description = "Portfolio and thoughts on web development.";
+
+const projects = (await getCollection('portfolio')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+).slice(0, 3);
 ---
 
-<Layout>
-	<Welcome />
+<Layout title={title} description={description}>
+  <Header />
+  
+  <main>
+    <section class="hero">
+      <h1 class="hero-title">
+        <span class="lang-en">CRAFTING DIGITAL <br/> EXPERIENCES.</span>
+        <span class="lang-id">MENCIPTAKAN PENGALAMAN <br/> DIGITAL.</span>
+      </h1>
+      <p class="hero-subtitle">
+        <span class="lang-en">
+          Creative Generalist based in Indonesia.<br/>
+          Bridging the gap between engineering, design, and AI.
+        </span>
+        <span class="lang-id">
+          Creative Generalist berbasis di Indonesia.<br/>
+          Menjembatani kesenjangan antara rekayasa, desain, dan AI.
+        </span>
+      </p>
+      <div class="cta-group">
+        <a href="/portfolio" class="btn btn-primary">
+          <span class="lang-en">View Work</span>
+          <span class="lang-id">Lihat Karya</span>
+        </a>
+        <a href="/about" class="btn btn-secondary">
+          <span class="lang-en">About Me</span>
+          <span class="lang-id">Tentang Saya</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>
+          <span class="lang-en">SELECTED WORK</span>
+          <span class="lang-id">KARYA PILIHAN</span>
+        </h2>
+        <a href="/portfolio" class="more-link">
+          <span class="lang-en">See All &rarr;</span>
+          <span class="lang-id">Lihat Semua &rarr;</span>
+        </a>
+      </div>
+      
+      <div class="project-grid">
+        {projects.length > 0 ? (
+          projects.map((project) => (
+            <ProjectCard
+              title={project.data.title}
+              description={project.data.description}
+              tags={project.data.tags}
+              href={`/portfolio/${project.slug}`}
+            />
+          ))
+        ) : (
+          <p class="empty-state">
+            <span class="lang-en">Projects coming soon...</span>
+            <span class="lang-id">Proyek akan segera hadir...</span>
+          </p>
+        )}
+      </div>
+    </section>
+  </main>
+
+  <Footer />
 </Layout>
+
+<style>
+  .hero {
+    padding: 6rem 0;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 4rem;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+    color: var(--color-text-muted);
+  }
+
+  .cta-group {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.8rem 1.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    border: 2px solid var(--color-text);
+  }
+
+  .btn-primary {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+  
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--color-text);
+    opacity: 1;
+  }
+  
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-text);
+  }
+  
+  .btn-secondary:hover {
+    background: var(--color-text);
+    color: var(--color-bg);
+    opacity: 1;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--color-text);
+    padding-bottom: 1rem;
+  }
+  
+  .section-header h2 {
+    margin: 0;
+    font-size: 2rem;
+  }
+  
+  .more-link {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .placeholder-text {
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-style: italic;
+    color: var(--color-text-muted);
+    padding: 2rem;
+    background: var(--color-bg-alt);
+    border-radius: 4px;
+  }
+</style>

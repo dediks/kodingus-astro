@@ -1,23 +1,126 @@
+---
+import '@fontsource/montserrat/400.css';
+import '@fontsource/montserrat/600.css';
+import '@fontsource/montserrat/800.css';
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = "My Personal Site", description = "Personal branding website" } = Astro.props;
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+    <meta name="description" content={description} />
+		<title>{title}</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/og-image.jpg', Astro.url)} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL('/og-image.jpg', Astro.url)} />
+    
+    <ClientRouter />
 	</head>
 	<body>
-		<slot />
+    <script is:inline>
+      // Initialize language state immediately to prevent flash
+      const savedLang = localStorage.getItem('language') || 'en';
+      document.documentElement.setAttribute('data-lang', savedLang);
+      
+      // Initialize Theme state
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      
+      if (savedTheme === 'dark') {
+        document.documentElement.style.colorScheme = 'dark';
+      }
+    </script>
+		<div class="layout-container">
+      <slot />
+    </div>
 	</body>
 </html>
 
-<style>
-	html,
+<style is:global>
+	:root {
+    /* Monochrome Palette - Light (Default) */
+		--color-bg: #ffffff;
+    --color-bg-alt: #f5f5f5;
+		--color-text: #1a1a1a;
+    --color-text-muted: #666666;
+    --color-border: #e0e0e0;
+    --color-accent: #000000;
+    
+    /* Typography */
+    --font-heading: 'Montserrat', sans-serif;
+    --font-body: 'Montserrat', sans-serif;
+	}
+
+  /* Dark Mode Overrides */
+  html[data-theme="dark"] {
+    --color-bg: #111111;
+    --color-bg-alt: #1a1a1a;
+    --color-text: #f0f0f0;
+    --color-text-muted: #a0a0a0;
+    --color-border: #333333;
+    --color-accent: #ffffff;
+  }
+
+	html {
+		font-family: var(--font-body);
+		background: var(--color-bg);
+    color: var(--color-text);
+    scroll-behavior: smooth;
+	}
+
 	body {
 		margin: 0;
 		width: 100%;
-		height: 100%;
+    min-height: 100vh;
+    line-height: 1.6;
 	}
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 800; /* Bold/Black for stronger monochrome impact */
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+  
+  a:hover {
+    opacity: 0.7;
+  }
+
+  .layout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  
+  /* Utilities */
+  .text-muted { color: var(--color-text-muted); }
+  .uppercase { text-transform: uppercase; letter-spacing: 0.05em; }
 </style>

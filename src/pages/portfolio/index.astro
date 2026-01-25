@@ -1,0 +1,70 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+
+const title = "Portfolio - Kodingus";
+const description = "Selected work showcasing engineering, design, and creativity.";
+
+const projects = (await getCollection('portfolio')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<Layout title={title} description={description}>
+  <Header />
+  
+  <main>
+    <section>
+      <h1>
+        <span class="lang-en">PORTFOLIO</span>
+        <span class="lang-id">PORTOFOLIO</span>
+      </h1>
+      <div class="project-grid">
+        {projects.length > 0 ? (
+          projects.map((project) => (
+            <ProjectCard
+              title={project.data.title}
+              description={project.data.description}
+              tags={project.data.tags}
+              href={`/portfolio/${project.slug}`}
+            />
+          ))
+        ) : (
+          <p class="empty-state">
+            <span class="lang-en">No projects found. Check back later!</span>
+            <span class="lang-id">Belum ada proyek. Cek lagi nanti!</span>
+          </p>
+        )}
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-style: italic;
+    color: var(--color-text-muted);
+    padding: 3rem;
+    background: var(--color-bg-alt);
+    border-radius: 4px;
+  }
+</style>

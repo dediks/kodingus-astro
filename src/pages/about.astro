@@ -1,0 +1,312 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const title = "About - Kodingus";
+const description = "Learn more about Dedik, a web developer and designer.";
+---
+
+<Layout title={title} description={description}>
+  <Header />
+
+  <main>
+    <section class="about-section">
+      <div class="profile-container">
+        <img src="/profile.jpg" alt="Ded Profile Picture" class="profile-image" />
+        <span class="profile-text">Ded.</span>
+      </div>
+      
+      <div class="bio-content">
+          <div class="lang-en">
+            <p class="lead">
+              From Code to Creation. I am Dedik, a Creative Generalist who bridges the gap between logic and art.
+            </p>
+
+            <p>
+              It started simply as <strong>"Kodingus"</strong>—a pursuit of pure coding and engineering. But as Artificial Intelligence reshaped the landscape, I realized that code was no longer just a tool for logic, but a gateway to boundless creativity.
+            </p>
+
+            <p>
+              AI didn't replace my craft; it expanded my canvas. It allowed me to transcend the boundaries of a traditional developer. Today, I don't just build websites; I orchestrate digital experiences—blending robust engineering with design, audio, and storytelling.
+            </p>
+
+            <p>
+              I believe the future belongs to the generalists—those who can speak the languages of machines and humans fluently. My mission is to engineer simplicity in a complex world.
+            </p>
+          
+          <div class="skills-container">
+            <h2>SKILLS & TOOLS</h2>
+            <ul class="skills-list">
+              <li>HTML & CSS</li>
+              <li>JavaScript / TypeScript</li>
+              <li>React & Next.js</li>
+              <li>Astro</li>
+              <li>Node.js</li>
+              <li>Git & GitHub</li>
+              <li>SQL & NoSQL</li>
+              <li>Tailwind CSS</li>
+              <li>REST & GraphQL</li>
+              <li>Performance Tuning</li>
+              <li>SEO Best Practices</li>
+              <li>UI/UX Design</li>
+            </ul>
+          </div>
+
+          <div class="contact-methods">
+            <h2>GET IN TOUCH</h2>
+            <p>
+              Interested in working together or just want to say hi? Feel free to reach out via email or social media.
+            </p>
+            <div class="social-links-grid">
+              <a href="mailto:contact@kodingus.com" class="social-link email">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <span class="handle">Email</span>
+              </a>
+              <a href="https://github.com/dedik" target="_blank" class="social-link github">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                <span class="handle">GitHub</span>
+              </a>
+              <a href="https://linkedin.com/in/dedik" target="_blank" class="social-link linkedin">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                <span class="handle">LinkedIn</span>
+              </a>
+              <a href="https://instagram.com/dedik" target="_blank" class="social-link instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                <span class="handle">Instagram</span>
+              </a>
+              <a href="https://facebook.com/dedik" target="_blank" class="social-link facebook">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                <span class="handle">Facebook</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lang-id">
+          <p class="lead">
+            Dari Kode Menjadi Karya. Saya Dedik, seorang Creative Generalist yang menjembatani logika dan seni.
+          </p>
+
+          <p>
+            Semua bermula dari <strong>"Kodingus"</strong>—sebuah dedikasi pada kode dan rekayasa perangkat lunak. Namun, ketika Kecerdasan Buatan (AI) mulai mengubah lanskap teknologi, saya menyadari bahwa kode bukan lagi sekadar alat logika, melainkan pintu gerbang menuju kreativitas tanpa batas.
+          </p>
+
+          <p>
+            AI tidak menggantikan keahlian saya; ia memperluas kanvas saya. Hal ini memungkinkan saya melampaui batasan developer tradisional. Hari ini, saya tidak hanya membuat website; saya menyusun pengalaman digital—memadukan teknik yang kokoh dengan desain, audio, dan narasi.
+          </p>
+
+          <p>
+            Saya percaya masa depan adalah milik para generalis—mereka yang fasih berbicara dalam bahasa mesin dan manusia. Misi saya adalah merekayasa kesederhanaan di dunia yang kompleks.
+          </p>
+          
+          <div class="skills-container">
+            <h2>KEAHLIAN & ALAT</h2>
+            <ul class="skills-list">
+              <li>HTML & CSS</li>
+              <li>JavaScript / TypeScript</li>
+              <li>React & Next.js</li>
+              <li>Astro</li>
+              <li>Node.js</li>
+              <li>Git & GitHub</li>
+              <li>SQL & NoSQL</li>
+              <li>Tailwind CSS</li>
+              <li>REST & GraphQL</li>
+              <li>Performance Tuning</li>
+              <li>SEO Best Practices</li>
+              <li>UI/UX Design</li>
+            </ul>
+          </div>
+
+          <div class="contact-methods">
+            <h2>HUBUNGI SAYA</h2>
+            <p>
+              Tertarik untuk bekerja sama atau sekadar menyapa? Jangan ragu untuk menghubungi saya melalui email atau media sosial.
+            </p>
+            <div class="social-links-grid">
+              <a href="mailto:contact@kodingus.com" class="social-link email">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <span class="handle">Email</span>
+              </a>
+              <a href="https://github.com/dedik" target="_blank" class="social-link github">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                <span class="handle">GitHub</span>
+              </a>
+              <a href="https://linkedin.com/in/dedik" target="_blank" class="social-link linkedin">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                <span class="handle">LinkedIn</span>
+              </a>
+              <a href="https://instagram.com/dedik" target="_blank" class="social-link instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                <span class="handle">Instagram</span>
+              </a>
+              <a href="https://facebook.com/dedik" target="_blank" class="social-link facebook">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                <span class="handle">Facebook</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .about-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .about-section {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
+  .profile-container {
+    position: relative;
+    width: fit-content;
+    /* Removed margin: 0 auto; to align left with layout */
+  }
+
+  .profile-image {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 4px;
+    filter: grayscale(100%);
+    border: 1px solid var(--color-border);
+    display: block;
+  }
+  
+  .profile-text {
+    position: absolute;
+    bottom: -1rem;
+    right: -2rem;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 4rem;
+    color: var(--color-text);
+    z-index: 10;
+    line-height: 1;
+    background: var(--color-bg); /* Optional: to make it pop over grid lines */
+    padding: 0 0.5rem;
+  }
+
+  h1 {
+    font-size: 3rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    margin-top: 2.5rem;
+  }
+
+  .lead {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+  }
+
+  .skills-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .skills-list li {
+    background: var(--color-bg-alt);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-border);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .contact-methods {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .social-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .social-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center icon */
+    justify-content: center;
+    padding: 1.5rem; /* Increase padding */
+    border: 1px solid var(--color-border);
+    transition: all 0.2s ease;
+    gap: 0.5rem;
+  }
+  
+  .social-link:hover {
+    background: var(--color-text);
+    color: var(--color-bg);
+    transform: translateY(-2px);
+  }
+
+  .social-link svg {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .social-link .handle {
+    font-weight: 600;
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+  }
+
+  /* Visibility Logic based on Global State */
+  .lang-en, .lang-id {
+    display: none; /* Hidden by default to prevent flash */
+    animation: fadeIn 0.3s ease;
+  }
+
+  /* Default show EN if NO data-lang present (fallback) */
+  :global(html:not([data-lang])) .lang-en {
+    display: block;
+  }
+
+  /* Show based on data-lang attribute */
+  :global(html[data-lang="en"]) .lang-en {
+    display: block;
+  }
+
+  :global(html[data-lang="id"]) .lang-id {
+    display: block;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

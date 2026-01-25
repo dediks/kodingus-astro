@@ -1,0 +1,117 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getCollection } from 'astro:content';
+
+const title = "Blog - Kodingus";
+const description = "Thoughts on code, AI, and the art of creation.";
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<Layout title={title} description={description}>
+  <Header />
+  
+  <main>
+    <section>
+      <h1>
+        <span class="lang-en">WRITINGS</span>
+        <span class="lang-id">TULISAN</span>
+      </h1>
+      <ul class="post-list">
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <li>
+              <a href={`/blog/${post.slug}`}>
+                <span class="post-date">
+                  <span class="lang-en">
+                    {post.data.pubDate.toLocaleDateString('en-us', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </span>
+                  <span class="lang-id">
+                    {post.data.pubDate.toLocaleDateString('id-ID', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </span>
+                </span>
+                <span class="post-title">{post.data.title}</span>
+              </a>
+            </li>
+          ))
+        ) : (
+          <li class="empty-state">
+            <span class="lang-en">No articles yet. Stay tuned!</span>
+            <span class="lang-id">Belum ada artikel. Pantau terus!</span>
+          </li>
+        )}
+      </ul>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+  }
+
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .post-list li {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .post-list a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 1.5rem 0;
+    transition: padding-left 0.2s ease;
+  }
+
+  .post-list a:hover {
+    padding-left: 1rem;
+    background: var(--color-bg-alt);
+    text-decoration: none;
+    opacity: 1;
+  }
+
+  .post-date {
+    font-family: monospace;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-right: 2rem;
+    min-width: 120px;
+  }
+
+  .post-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .empty-state {
+    text-align: center;
+    font-style: italic;
+    color: var(--color-text-muted);
+    padding: 3rem;
+    background: var(--color-bg-alt);
+    border-radius: 4px;
+    list-style: none;
+    border-bottom: none !important;
+  }
+</style>

@@ -1,0 +1,119 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	return posts.map((post) => ({
+		params: { slug: post.slug },
+		props: post,
+	}));
+}
+
+const post = Astro.props;
+const { Content } = await post.render();
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <Header />
+  
+  <main>
+    <article>
+      <header>
+        <a href="/blog" class="back-link">
+          <span class="lang-en">&larr; Back to Writings</span>
+          <span class="lang-id">&larr; Kembali ke Tulisan</span>
+        </a>
+        <div class="post-meta">
+          <time datetime={post.data.pubDate.toISOString()}>
+            <span class="lang-en">
+              {post.data.pubDate.toLocaleDateString('en-us', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </span>
+            <span class="lang-id">
+              {post.data.pubDate.toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </span>
+          </time>
+        </div>
+        <h1>{post.data.title}</h1>
+        {post.data.heroImage && <img width={1020} height={510} src={post.data.heroImage} alt="" />}
+      </header>
+      
+      <div class="content">
+        <Content />
+      </div>
+    </article>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  article {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 3rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin: 1rem 0;
+    line-height: 1.2;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+    font-weight: 600;
+  }
+
+  .post-meta {
+    font-family: monospace;
+    color: var(--color-text-muted);
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-top: 2rem;
+  }
+
+  .content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+  }
+  
+  /* Markdown Content Styles */
+  .content :global(h2) {
+    font-size: 1.8rem;
+    margin-top: 2.5rem;
+  }
+  
+  .content :global(p) {
+    margin-bottom: 1.5rem;
+  }
+  
+  .content :global(ul) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  
+  .content :global(li) {
+    margin-bottom: 0.5rem;
+  }
+</style>
