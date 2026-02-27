@@ -1,9 +1,9 @@
 ---
 const links = [
-  { href: '/', labelEn: 'Home', labelId: 'Beranda' },
-  { href: '/portfolio', labelEn: 'Portfolio', labelId: 'Portofolio' },
-  { href: '/blog', labelEn: 'Blog', labelId: 'Blog' },
-  { href: '/about', labelEn: 'About', labelId: 'Tentang' },
+  { href: "/", labelEn: "Home", labelId: "Beranda" },
+  { href: "/portfolio", labelEn: "Portfolio", labelId: "Portofolio" },
+  { href: "/blog", labelEn: "Blog", labelId: "Blog" },
+  { href: "/about", labelEn: "About", labelId: "Tentang" },
 ];
 ---
 
@@ -12,9 +12,8 @@ const links = [
     <div class="logo">
       <a href="/">KODINGUS</a>
     </div>
-    
-    <div class="header-actions">
 
+    <div class="header-actions">
       <button id="menu-toggle" class="menu-toggle" aria-label="Toggle Menu">
         <span class="bar"></span>
         <span class="bar"></span>
@@ -24,27 +23,36 @@ const links = [
 
     <nav id="nav-menu" class="nav-menu">
       <ul>
-        {links.map((link) => {
-          const isActive = Astro.url.pathname === link.href || 
-                           (link.href !== '/' && Astro.url.pathname.startsWith(link.href));
-          return (
-            <li>
-              <a href={link.href} class={isActive ? 'active' : ''}>
-                <span class="lang-en">{link.labelEn}</span>
-                <span class="lang-id">{link.labelId}</span>
-              </a>
-            </li>
-          );
-        })}
+        {
+          links.map((link) => {
+            const isActive =
+              Astro.url.pathname === link.href ||
+              (link.href !== "/" && Astro.url.pathname.startsWith(link.href));
+            return (
+              <li>
+                <a href={link.href} class={isActive ? "active" : ""}>
+                  <span class="lang-en">{link.labelEn}</span>
+                  <span class="lang-id">{link.labelId}</span>
+                </a>
+              </li>
+            );
+          })
+        }
       </ul>
       <div class="nav-controls">
         <div class="lang-toggle">
-          <button id="lang-btn-en" class="active" aria-label="Switch to English">EN</button>
+          <button id="lang-btn-en" class="active" aria-label="Switch to English"
+            >EN</button
+          >
           <span class="separator">/</span>
           <button id="lang-btn-id" aria-label="Switch to Indonesia">ID</button>
         </div>
 
-        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Dark Mode">
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          aria-label="Toggle Dark Mode"
+        >
           <span class="sun-icon">☀</span>
           <span class="moon-icon">☾</span>
         </button>
@@ -56,34 +64,34 @@ const links = [
 <script>
   // Mobile Menu Logic
   function initMobileMenu() {
-    const menuToggle = document.getElementById('menu-toggle');
-    const navMenu = document.getElementById('nav-menu');
+    const menuToggle = document.getElementById("menu-toggle");
+    const navMenu = document.getElementById("nav-menu");
 
     if (menuToggle && navMenu) {
       // Clone to remove old listeners (cleanup for View Transitions)
-      const newToggle = menuToggle.cloneNode(true);
+      const newToggle = menuToggle.cloneNode(true) as HTMLElement;
       menuToggle.parentNode.replaceChild(newToggle, menuToggle);
-      
-      newToggle.addEventListener('click', () => {
-        newToggle.classList.toggle('active');
-        navMenu.classList.toggle('active');
-        document.body.classList.toggle('no-scroll');
+
+      newToggle.addEventListener("click", () => {
+        newToggle.classList.toggle("active");
+        navMenu.classList.toggle("active");
+        document.body.classList.toggle("no-scroll");
       });
-      
+
       // Close menu when clicking a link
-      navMenu.querySelectorAll('a').forEach(link => {
-        // Clone links too to prevent duplicate listeners if necessary, 
-        // but simplest is to just add the listener since navMenu is re-rendered or stable? 
+      navMenu.querySelectorAll("a").forEach((link) => {
+        // Clone links too to prevent duplicate listeners if necessary,
+        // but simplest is to just add the listener since navMenu is re-rendered or stable?
         // Actually, if Header is re-rendered, these are new elements.
         // If Header is persistent, we need cleanup.
         // Let's assume re-render for safely, but if persist, this adds duplicates.
         // Better: use { once: true } or named function, OR rely on the fact that if re-rendered, it's fine.
         // BUT, since we clone menuToggle, we must reference the NEW newToggle in the closure.
-        
-        link.addEventListener('click', () => {
-          newToggle.classList.remove('active');
-          navMenu.classList.remove('active');
-          document.body.classList.remove('no-scroll');
+
+        link.addEventListener("click", () => {
+          newToggle.classList.remove("active");
+          navMenu.classList.remove("active");
+          document.body.classList.remove("no-scroll");
         });
       });
     }
@@ -91,56 +99,59 @@ const links = [
 
   // Global Language Logic
   function initLanguage() {
-    const btnEn = document.getElementById('lang-btn-en');
-    const btnId = document.getElementById('lang-btn-id');
-    
+    const btnEn = document.getElementById("lang-btn-en");
+    const btnId = document.getElementById("lang-btn-id");
+
     function setLanguage(lang) {
-      localStorage.setItem('language', lang);
-      document.documentElement.setAttribute('data-lang', lang);
-      
-      if (lang === 'en') {
-        btnEn?.classList.add('active');
-        btnId?.classList.remove('active');
+      localStorage.setItem("language", lang);
+      document.documentElement.setAttribute("data-lang", lang);
+      // Keep html[lang] in sync for a11y and SEO
+      document.documentElement.setAttribute("lang", lang);
+
+      if (lang === "en") {
+        btnEn?.classList.add("active");
+        btnId?.classList.remove("active");
       } else {
-        btnId?.classList.add('active');
-        btnEn?.classList.remove('active');
+        btnId?.classList.add("active");
+        btnEn?.classList.remove("active");
       }
     }
 
-    const savedLang = localStorage.getItem('language') || 'en';
+    const savedLang = localStorage.getItem("language") || "en";
     setLanguage(savedLang);
 
     if (btnEn && btnId) {
       // Clean up old listeners to prevent duplicates on view transition
-      const newBtnEn = btnEn.cloneNode(true);
-      const newBtnId = btnId.cloneNode(true);
+      const newBtnEn = btnEn.cloneNode(true) as HTMLElement;
+      const newBtnId = btnId.cloneNode(true) as HTMLElement;
       btnEn.parentNode.replaceChild(newBtnEn, btnEn);
       btnId.parentNode.replaceChild(newBtnId, btnId);
 
-      newBtnEn.addEventListener('click', () => setLanguage('en'));
-      newBtnId.addEventListener('click', () => setLanguage('id'));
+      newBtnEn.addEventListener("click", () => setLanguage("en"));
+      newBtnId.addEventListener("click", () => setLanguage("id"));
     }
   }
 
   // Dark Mode Logic
   function initTheme() {
-    const themeToggle = document.getElementById('theme-toggle');
-    
+    const themeToggle = document.getElementById("theme-toggle");
+
     function setTheme(theme) {
-      localStorage.setItem('theme', theme);
-      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem("theme", theme);
+      document.documentElement.setAttribute("data-theme", theme);
     }
-    
+
     // Initial State is handled in Layout head script to prevent flash
     // We just need to attach listener here
-    
+
     if (themeToggle) {
-      const newToggle = themeToggle.cloneNode(true);
+      const newToggle = themeToggle.cloneNode(true) as HTMLElement;
       themeToggle.parentNode.replaceChild(newToggle, themeToggle);
-      
-      newToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+      newToggle.addEventListener("click", () => {
+        const currentTheme =
+          document.documentElement.getAttribute("data-theme") || "light";
+        const newTheme = currentTheme === "light" ? "dark" : "light";
         setTheme(newTheme);
       });
     }
@@ -152,7 +163,7 @@ const links = [
   initTheme();
 
   // Run on view transitions navigation
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener("astro:page-load", () => {
     initMobileMenu();
     initLanguage();
     initTheme();
@@ -207,13 +218,13 @@ const links = [
     letter-spacing: 0.05em;
     position: relative;
   }
-  
+
   nav a.active {
     text-decoration: underline;
     text-underline-offset: 4px;
     opacity: 1; /* Ensure active link is fully opaque */
   }
-  
+
   /* Nav Layout */
   .nav-menu {
     display: flex;
@@ -237,7 +248,7 @@ const links = [
     font-family: var(--font-heading);
     font-weight: 700;
   }
-  
+
   .lang-toggle button {
     background: none;
     border: none;
@@ -249,12 +260,12 @@ const links = [
     padding: 0;
     transition: color 0.2s ease;
   }
-  
+
   .lang-toggle button.active {
     color: var(--color-text);
     text-decoration: underline;
   }
-  
+
   .separator {
     margin: 0 0.3rem;
     color: var(--color-text-muted);
@@ -273,11 +284,19 @@ const links = [
   }
 
   /* Show sun in dark mode, moon in light mode */
-  :global(html[data-theme="dark"]) .moon-icon { display: none; }
-  :global(html[data-theme="dark"]) .sun-icon { display: block; }
-  
-  :global(html:not([data-theme="dark"])) .moon-icon { display: block; }
-  :global(html:not([data-theme="dark"])) .sun-icon { display: none; }
+  :global(html[data-theme="dark"]) .moon-icon {
+    display: none;
+  }
+  :global(html[data-theme="dark"]) .sun-icon {
+    display: block;
+  }
+
+  :global(html:not([data-theme="dark"])) .moon-icon {
+    display: block;
+  }
+  :global(html:not([data-theme="dark"])) .sun-icon {
+    display: none;
+  }
 
   /* Mobile Menu Styles */
   .menu-toggle {
@@ -304,7 +323,7 @@ const links = [
     .menu-toggle {
       display: flex;
     }
-    
+
     /* Make sure header actions stay aligned */
     .header-actions {
       gap: 1rem;
@@ -336,7 +355,7 @@ const links = [
       align-items: center;
       gap: 2rem;
     }
-    
+
     .nav-controls {
       display: flex;
       flex-direction: row; /* Keep row in mobile for controls */
@@ -365,16 +384,17 @@ const links = [
       transform: translateY(-9px) rotate(-45deg);
     }
   }
-  
+
   :global(body.no-scroll) {
     overflow: hidden;
   }
 
   /* Global Language Visibility */
-  :global(.lang-en), :global(.lang-id) {
+  :global(.lang-en),
+  :global(.lang-id) {
     display: none;
   }
-  
+
   :global(html:not([data-lang])) :global(.lang-en),
   :global(html[data-lang="en"]) :global(.lang-en) {
     display: block;
