@@ -1,0 +1,154 @@
+---
+
+---
+
+<section class="services-list" aria-label="Our Digital Services">
+    <article class="service-card">
+        <div class="service-number" aria-hidden="true">01</div>
+        <div class="service-content">
+            <h2>
+                <span class="lang-en">WEB DEVELOPMENT</span>
+                <span class="lang-id">PENGEMBANGAN WEB</span>
+            </h2>
+            <p class="lang-en">
+                Custom, high-performance web applications built with modern
+                technologies like React, Next.js, and Astro. We create scalable
+                solutions that grow with your business, ensuring fast load times
+                and seamless user experiences.
+            </p>
+            <p class="lang-id">
+                Aplikasi web kustom berskala tinggi yang dibangun dengan
+                teknologi modern seperti React, Next.js, dan Astro. Kami
+                merancang solusi terukur yang berkembang bersama bisnis Anda,
+                memastikan waktu muat cepat dan pengalaman pengguna yang mulus.
+            </p>
+        </div>
+    </article>
+
+    <article class="service-card">
+        <div class="service-number" aria-hidden="true">02</div>
+        <div class="service-content">
+            <h2>
+                <span class="lang-en">UI/UX DESIGN</span>
+                <span class="lang-id">DESAIN UI/UX</span>
+            </h2>
+            <p class="lang-en">
+                Beautiful, intuitive user interfaces focused on conversion and
+                usability. We design engaging digital products that delight your
+                users and effectively communicate your brand's unique value
+                proposition.
+            </p>
+            <p class="lang-id">
+                Antarmuka pengguna yang indah dan intuitif yang berfokus pada
+                konversi dan kegunaan. Kami merancang produk digital menarik
+                yang memuaskan pengguna Anda dan secara efektif
+                mengkomunikasikan proposisi nilai unik dari merek Anda.
+            </p>
+        </div>
+    </article>
+
+    <article class="service-card">
+        <div class="service-number" aria-hidden="true">03</div>
+        <div class="service-content">
+            <h2>
+                <span class="lang-en">DEPLOYMENT & MAINTENANCE</span>
+                <span class="lang-id">DEPLOYMENT & PEMELIHARAAN</span>
+            </h2>
+            <p class="lang-en">
+                Reliable cloud hosting setup, CI/CD pipeline configuration, and
+                ongoing technical support. We ensure your application remains
+                secure, up-to-date, and performs flawlessly under any amount of
+                traffic.
+            </p>
+            <p class="lang-id">
+                Pengaturan hosting cloud yang andal, konfigurasi pipeline CI/CD,
+                dan dukungan teknis berkelanjutan. Kami memastikan aplikasi Anda
+                tetap aman, terbaru, dan bekerja dengan sempurna di bawah
+                berbagai tingkat lalu lintas pengunjung.
+            </p>
+        </div>
+    </article>
+</section>
+
+<style>
+    .services-list {
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+        margin-bottom: 5rem;
+    }
+
+    .service-card {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--color-border);
+    }
+
+    @media (min-width: 768px) {
+        .service-card {
+            grid-template-columns: auto 1fr;
+            gap: 4rem;
+        }
+    }
+
+    .service-number {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 3rem;
+        color: var(--color-text-muted);
+        opacity: 0.5;
+        line-height: 1;
+    }
+
+    @media (min-width: 768px) {
+        .service-number {
+            font-size: 5rem;
+        }
+    }
+
+    .service-content h2 {
+        font-size: 1.8rem;
+        margin-top: 0;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+    }
+
+    .service-content p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--color-text);
+        margin: 0;
+    }
+
+    /* Language Visibility */
+    .lang-en,
+    .lang-id {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    :global(html:not([data-lang])) .lang-en {
+        display: block;
+    }
+
+    :global(html[data-lang="en"]) .lang-en {
+        display: block;
+    }
+
+    :global(html[data-lang="id"]) .lang-id {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

@@ -1,0 +1,73 @@
+---
+
+---
+
+<section class="services-hero">
+    <h1 class="hero-title">
+        <span class="lang-en">OUR SERVICES</span>
+        <span class="lang-id">LAYANAN KAMI</span>
+    </h1>
+    <p class="hero-subtitle">
+        <span class="lang-en">
+            Comprehensive digital solutions tailored to your needs. We handle
+            everything from initial design to final deployment.
+        </span>
+        <span class="lang-id">
+            Solusi digital komprehensif yang disesuaikan dengan kebutuhan Anda.
+            Kami menangani semuanya mulai dari desain awal hingga peluncuran
+            akhir.
+        </span>
+    </p>
+</section>
+
+<style>
+    .services-hero {
+        padding: clamp(2rem, 5vw, 4rem) 0;
+        margin-bottom: 2rem;
+    }
+
+    .hero-title {
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        line-height: 1.05;
+        margin-bottom: 1.25rem;
+        text-transform: uppercase;
+        letter-spacing: -0.01em;
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.1rem, 2vw, 1.4rem);
+        max-width: 600px;
+        color: var(--color-text-muted);
+        line-height: 1.6;
+    }
+
+    /* Language Visibility */
+    .lang-en,
+    .lang-id {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    :global(html:not([data-lang])) .lang-en {
+        display: block;
+    }
+
+    :global(html[data-lang="en"]) .lang-en {
+        display: block;
+    }
+
+    :global(html[data-lang="id"]) .lang-id {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

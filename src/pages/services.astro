@@ -1,0 +1,66 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import ServicesHero from "../components/services/ServicesHero.astro";
+import ServicesList from "../components/services/ServicesList.astro";
+import ServicesCTA from "../components/services/ServicesCTA.astro";
+
+const title = "Services - Kodingus";
+const description =
+    "Comprehensive digital solutions tailored to your needs. We provide Web Development, UI/UX Design, and Deployment services to elevate your brand.";
+
+const schema = JSON.stringify({
+    "@context": "https://schema.org/",
+    "@type": "Service",
+    serviceType: "Web Development & Design",
+    provider: {
+        "@type": "LocalBusiness",
+        name: "Kodingus",
+    },
+    areaServed: "Worldwide",
+    hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Digital Services",
+        itemListElement: [
+            {
+                "@type": "Offer",
+                itemOffered: {
+                    "@type": "Service",
+                    name: "Web Development",
+                },
+            },
+            {
+                "@type": "Offer",
+                itemOffered: {
+                    "@type": "Service",
+                    name: "UI/UX Design",
+                },
+            },
+            {
+                "@type": "Offer",
+                itemOffered: {
+                    "@type": "Service",
+                    name: "Deployment & Maintenance",
+                },
+            },
+        ],
+    },
+});
+---
+
+<Layout title={title} description={description}>
+    <Fragment slot="head">
+        <script type="application/ld+json" set:html={schema} />
+    </Fragment>
+
+    <Header />
+
+    <main>
+        <ServicesHero />
+        <ServicesList />
+        <ServicesCTA />
+    </main>
+
+    <Footer />
+</Layout>

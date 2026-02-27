@@ -1,0 +1,100 @@
+---
+
+---
+
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>
+            <span class="lang-en">READY TO START YOUR PROJECT?</span>
+            <span class="lang-id">SIAP MEMULAI PROYEK ANDA?</span>
+        </h2>
+        <p>
+            <span class="lang-en"
+                >Let's discuss how we can help bring your ideas to life.</span
+            >
+            <span class="lang-id"
+                >Mari diskusikan bagaimana kami bisa membantu mewujudkan ide
+                Anda.</span
+            >
+        </p>
+        <a href="/about" class="btn btn-primary">
+            <span class="lang-en">Get in Touch</span>
+            <span class="lang-id">Hubungi Kami</span>
+        </a>
+    </div>
+</section>
+
+<style>
+    .cta-section {
+        padding: 4rem 0;
+        border-top: 2px solid var(--color-text);
+        border-bottom: 2px solid var(--color-text);
+        margin-bottom: 3rem;
+        text-align: center;
+        background: var(--color-bg-alt);
+    }
+
+    .cta-content h2 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+    }
+
+    .cta-content p {
+        font-size: 1.2rem;
+        color: var(--color-text-muted);
+        margin-bottom: 2rem;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 1rem;
+        letter-spacing: 0.05em;
+        border: 2px solid var(--color-text);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background: var(--color-text);
+        color: var(--color-bg);
+    }
+
+    .btn-primary:hover {
+        background: transparent;
+        color: var(--color-text);
+    }
+
+    /* Language Visibility */
+    .lang-en,
+    .lang-id {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    :global(html:not([data-lang])) .lang-en {
+        display: block;
+    }
+
+    :global(html[data-lang="en"]) .lang-en {
+        display: block;
+    }
+
+    :global(html[data-lang="id"]) .lang-id {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
