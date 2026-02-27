@@ -70,7 +70,7 @@ const links = [
     if (menuToggle && navMenu) {
       // Clone to remove old listeners (cleanup for View Transitions)
       const newToggle = menuToggle.cloneNode(true) as HTMLElement;
-      menuToggle.parentNode.replaceChild(newToggle, menuToggle);
+      menuToggle.parentNode?.replaceChild(newToggle, menuToggle);
 
       newToggle.addEventListener("click", () => {
         newToggle.classList.toggle("active");
@@ -102,7 +102,7 @@ const links = [
     const btnEn = document.getElementById("lang-btn-en");
     const btnId = document.getElementById("lang-btn-id");
 
-    function setLanguage(lang) {
+    function setLanguage(lang: string) {
       localStorage.setItem("language", lang);
       document.documentElement.setAttribute("data-lang", lang);
       // Keep html[lang] in sync for a11y and SEO
@@ -124,8 +124,8 @@ const links = [
       // Clean up old listeners to prevent duplicates on view transition
       const newBtnEn = btnEn.cloneNode(true) as HTMLElement;
       const newBtnId = btnId.cloneNode(true) as HTMLElement;
-      btnEn.parentNode.replaceChild(newBtnEn, btnEn);
-      btnId.parentNode.replaceChild(newBtnId, btnId);
+      btnEn.parentNode?.replaceChild(newBtnEn, btnEn);
+      btnId.parentNode?.replaceChild(newBtnId, btnId);
 
       newBtnEn.addEventListener("click", () => setLanguage("en"));
       newBtnId.addEventListener("click", () => setLanguage("id"));
@@ -136,7 +136,7 @@ const links = [
   function initTheme() {
     const themeToggle = document.getElementById("theme-toggle");
 
-    function setTheme(theme) {
+    function setTheme(theme: string) {
       localStorage.setItem("theme", theme);
       document.documentElement.setAttribute("data-theme", theme);
     }
@@ -146,7 +146,7 @@ const links = [
 
     if (themeToggle) {
       const newToggle = themeToggle.cloneNode(true) as HTMLElement;
-      themeToggle.parentNode.replaceChild(newToggle, themeToggle);
+      themeToggle.parentNode?.replaceChild(newToggle, themeToggle);
 
       newToggle.addEventListener("click", () => {
         const currentTheme =
