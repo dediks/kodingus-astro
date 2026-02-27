@@ -1,36 +1,37 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import ProjectCard from '../components/ProjectCard.astro';
-import { getCollection } from 'astro:content';
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { getCollection } from "astro:content";
 
 // Placeholder content for now
-const title = "Kodingus - The Creative Generalist";
-const description = "Portfolio and thoughts on web development.";
+const title = "Kodingus - Full-Stack Creative Developer";
+const description =
+  "Full-Stack Creative Developer. Design, build, and deploy — all in one.";
 
-const projects = (await getCollection('portfolio')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-).slice(0, 3);
+const projects = (await getCollection("portfolio"))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
 ---
 
 <Layout title={title} description={description}>
   <Header />
-  
+
   <main>
     <section class="hero">
       <h1 class="hero-title">
-        <span class="lang-en">CRAFTING DIGITAL <br/> EXPERIENCES.</span>
-        <span class="lang-id">MENCIPTAKAN PENGALAMAN <br/> DIGITAL.</span>
+        <span class="lang-en">YOUR ADAPTIVE<br />DIGITAL PARTNER</span>
+        <span class="lang-id">PARTNER DIGITAL<br />ADAPTIF ANDA</span>
       </h1>
       <p class="hero-subtitle">
         <span class="lang-en">
-          Creative Generalist based in Indonesia.<br/>
-          Bridging the gap between engineering, design, and AI.
+          Full-stack developer handling design, development, and deployment —
+          all in one.
         </span>
         <span class="lang-id">
-          Creative Generalist berbasis di Indonesia.<br/>
-          Menjembatani kesenjangan antara rekayasa, desain, dan AI.
+          Full-stack developer yang menangani desain, development, dan
+          deployment — semuanya dalam satu.
         </span>
       </p>
       <div class="cta-group">
@@ -56,23 +57,25 @@ const projects = (await getCollection('portfolio')).sort(
           <span class="lang-id">Lihat Semua &rarr;</span>
         </a>
       </div>
-      
+
       <div class="project-grid">
-        {projects.length > 0 ? (
-          projects.map((project) => (
-            <ProjectCard
-              title={project.data.title}
-              description={project.data.description}
-              tags={project.data.tags}
-              href={`/portfolio/${project.slug}`}
-            />
-          ))
-        ) : (
-          <p class="empty-state">
-            <span class="lang-en">Projects coming soon...</span>
-            <span class="lang-id">Proyek akan segera hadir...</span>
-          </p>
-        )}
+        {
+          projects.length > 0 ? (
+            projects.map((project) => (
+              <ProjectCard
+                title={project.data.title}
+                description={project.data.description}
+                tags={project.data.tags}
+                href={`/portfolio/${project.slug}`}
+              />
+            ))
+          ) : (
+            <p class="empty-state">
+              <span class="lang-en">Projects coming soon...</span>
+              <span class="lang-id">Proyek akan segera hadir...</span>
+            </p>
+          )
+        }
       </div>
     </section>
   </main>
@@ -120,18 +123,18 @@ const projects = (await getCollection('portfolio')).sort(
     background: var(--color-text);
     color: var(--color-bg);
   }
-  
+
   .btn-primary:hover {
     background: transparent;
     color: var(--color-text);
     opacity: 1;
   }
-  
+
   .btn-secondary {
     background: transparent;
     color: var(--color-text);
   }
-  
+
   .btn-secondary:hover {
     background: var(--color-text);
     color: var(--color-bg);
@@ -146,17 +149,17 @@ const projects = (await getCollection('portfolio')).sort(
     border-bottom: 2px solid var(--color-text);
     padding-bottom: 1rem;
   }
-  
+
   .section-header h2 {
     margin: 0;
     font-size: 2rem;
   }
-  
+
   .more-link {
     font-weight: 600;
     font-size: 0.9rem;
   }
-  
+
   .placeholder-text {
     font-style: italic;
     color: var(--color-text-muted);
@@ -167,7 +170,7 @@ const projects = (await getCollection('portfolio')).sort(
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
   }
-  
+
   .empty-state {
     grid-column: 1 / -1;
     text-align: center;
