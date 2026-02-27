@@ -21,7 +21,13 @@ const projects = (await getCollection("portfolio"))
   <main>
     <section class="hero">
       <h1 class="hero-title">
-        <span class="lang-en">YOUR ADAPTIVE<br />DIGITAL PARTNER</span>
+        <span class="lang-en"
+          >YOUR <span class="word-cycler" aria-label="ADAPTIVE"
+            ><span class="word active">ADAPTIVE</span><span class="word"
+              >DEDICATED</span
+            ></span
+          ><br />DIGITAL PARTNER</span
+        >
         <span class="lang-id">PARTNER DIGITAL<br />ADAPTIF ANDA</span>
       </h1>
       <p class="hero-subtitle">
@@ -95,6 +101,66 @@ const projects = (await getCollection("portfolio"))
     line-height: 1.1;
     margin-bottom: 1.5rem;
     text-transform: uppercase;
+  }
+
+  .word-cycler {
+    display: inline-grid;
+    justify-items: center;
+    position: relative;
+    vertical-align: middle;
+    background: var(--color-text);
+    color: var(--color-bg);
+    padding: 0.12em 0.5em 0.15em;
+    margin: 0 0.1em;
+    letter-spacing: 0.04em;
+    overflow: hidden;
+  }
+
+  /* scanner sweep pseudo-element */
+  .word-cycler::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-bg);
+    transform: translateX(-101%);
+    z-index: 1;
+  }
+
+  .word-cycler.scanning::after {
+    animation: sweep 0.5s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+  }
+
+  @keyframes sweep {
+    0% {
+      transform: translateX(-101%);
+    }
+    45% {
+      transform: translateX(0%);
+    }
+    55% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(101%);
+    }
+  }
+
+  .word-cycler .word {
+    grid-area: 1 / 1;
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    transition:
+      opacity 0.35s ease,
+      clip-path 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .word-cycler .word.active {
+    opacity: 1;
+    clip-path: inset(0 0% 0 0);
+    pointer-events: auto;
   }
 
   .hero-subtitle {
@@ -181,3 +247,25 @@ const projects = (await getCollection("portfolio"))
     border-radius: 4px;
   }
 </style>
+
+<script>
+  const cycler = document.querySelector(".word-cycler");
+  if (cycler) {
+    const words = cycler.querySelectorAll<HTMLElement>(".word");
+    let current = 0;
+
+    setInterval(() => {
+      // trigger the sweep animation
+      cycler.classList.remove("scanning");
+      void (cycler as HTMLElement).offsetWidth; // force reflow
+      cycler.classList.add("scanning");
+
+      // swap active word halfway through the sweep
+      setTimeout(() => {
+        words[current].classList.remove("active");
+        current = (current + 1) % words.length;
+        words[current].classList.add("active");
+      }, 225);
+    }, 2800);
+  }
+</script>
