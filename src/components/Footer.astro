@@ -23,4 +23,13 @@ const year = new Date().getFullYear();
     font-size: 0.875rem;
     color: var(--color-text-muted);
   }
+
+  @media (max-width: 600px) {
+    .footer {
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 1.25rem;
+      text-align: center;
+    }
+  }
 </style>
