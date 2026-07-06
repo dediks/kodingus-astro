@@ -116,4 +116,61 @@ const { Content } = await post.render();
   .content :global(li) {
     margin-bottom: 0.5rem;
   }
+
+  .content :global(h3) {
+    font-size: 1.3rem;
+    margin-top: 2rem;
+  }
+
+  /* ── Shiki dual-theme: wire up CSS vars to site theme ── */
+  /* Shiki emits --shiki-light and --shiki-dark on each token span.
+     We map them to 'color' and 'background-color' based on data-theme. */
+  :global(html[data-theme='light']) :global(.astro-code),
+  :global(html[data-theme='light']) :global(.astro-code span) {
+    color: var(--shiki-light) !important;
+    background-color: var(--shiki-light-bg) !important;
+  }
+
+  :global(html[data-theme='dark']) :global(.astro-code),
+  :global(html[data-theme='dark']) :global(.astro-code span) {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+
+  /* ── Code block container (pre) ── */
+  .content :global(pre) {
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.75rem 0;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    border-left: 3px solid var(--color-border);
+    /* Tidy scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  .content :global(pre::-webkit-scrollbar) {
+    height: 6px;
+  }
+
+  .content :global(pre::-webkit-scrollbar-track) {
+    background: transparent;
+  }
+
+  .content :global(pre::-webkit-scrollbar-thumb) {
+    background-color: var(--color-border);
+    border-radius: 3px;
+  }
+
+  /* ── Inline code ── */
+  .content :global(:not(pre) > code) {
+    font-size: 0.875em;
+    padding: 0.15em 0.45em;
+    border-radius: 3px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    font-family: monospace;
+  }
 </style>

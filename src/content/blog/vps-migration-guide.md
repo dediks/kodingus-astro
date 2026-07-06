@@ -112,7 +112,7 @@ nano .env
 
 Minimal `.env` example:
 
-```env
+```ini
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://domain.com
