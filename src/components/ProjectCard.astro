@@ -12,14 +12,18 @@ const { title, description, href, tags = [] } = Astro.props;
 <a href={href} class="project-card">
   <article>
     <header>
-      <h3>{title}</h3>
+      <h3>
+        {title}
+      </h3>
       {tags.length > 0 && (
         <div class="tags">
           {tags.map(tag => <span class="tag">{tag}</span>)}
         </div>
       )}
     </header>
-    <p>{description}</p>
+    <p>
+      {description}
+    </p>
     <div class="arrow">&rarr;</div>
   </article>
 </a>

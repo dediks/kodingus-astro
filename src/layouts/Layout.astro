@@ -4,6 +4,8 @@ import "@fontsource/montserrat/600.css";
 import "@fontsource/montserrat/800.css";
 import { ClientRouter } from "astro:transitions";
 
+import { getLangFromUrl, getAlternateUrl } from "../i18n/utils";
+
 interface Props {
   title?: string;
   description?: string;
@@ -20,11 +22,14 @@ const {
   tags = [],
 } = Astro.props;
 
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
+const lang = getLangFromUrl(Astro.url);
+const currentUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
+const enUrl = new URL(getAlternateUrl(Astro.url, 'en'), Astro.site ?? Astro.url.origin).href;
+const idUrl = new URL(getAlternateUrl(Astro.url, 'id'), Astro.site ?? Astro.url.origin).href;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -34,12 +39,12 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)
     <meta name="description" content={description} />
     <meta name="author" content="Dedik" />
     <title>{title}</title>
-    <link rel="canonical" href={canonicalUrl} />
+    <link rel="canonical" href={currentUrl.href} />
 
-    <!-- hreflang: bilingual EN / ID (client-side toggle, same URL) -->
-    <link rel="alternate" hreflang="en" href={canonicalUrl} />
-    <link rel="alternate" hreflang="id" href={canonicalUrl} />
-    <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+    <!-- hreflang: proper alternate URLs -->
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="id" href={idUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content={ogType} />
@@ -71,14 +76,11 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)
   <body>
     <script is:inline>
       // ── Initial page load ────────────────────────────────────────────
-      // Apply theme + lang immediately (before first paint) to avoid flash.
+      // Apply theme immediately (before first paint) to avoid flash.
       function applyTheme(doc) {
         const theme = localStorage.getItem("theme") || "light";
-        const lang = localStorage.getItem("language") || "en";
 
         doc.documentElement.setAttribute("data-theme", theme);
-        doc.documentElement.setAttribute("data-lang", lang);
-        doc.documentElement.setAttribute("lang", lang);
         doc.documentElement.style.colorScheme = theme === "dark" ? "dark" : "";
       }
 

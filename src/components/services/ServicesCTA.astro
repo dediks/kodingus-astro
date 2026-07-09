@@ -1,25 +1,24 @@
 ---
+import { useTranslations } from "../../i18n/utils";
 
+interface Props {
+    lang: 'en' | 'id';
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
 ---
 
 <section class="cta-section">
     <div class="cta-content">
         <h2>
-            <span class="lang-en">READY TO START YOUR PROJECT?</span>
-            <span class="lang-id">SIAP MEMULAI PROYEK ANDA?</span>
+            {t('services.cta.title')} <span>{t('services.cta.highlight')}</span>
         </h2>
         <p>
-            <span class="lang-en"
-                >Let's discuss how we can help bring your ideas to life.</span
-            >
-            <span class="lang-id"
-                >Mari diskusikan bagaimana kami bisa membantu mewujudkan ide
-                Anda.</span
-            >
+            {t('services.cta.subtitle')}
         </p>
-        <a href="/about" class="btn btn-primary">
-            <span class="lang-en">Get in Touch</span>
-            <span class="lang-id">Hubungi Kami</span>
+        <a href={lang === 'en' ? "/about" : `/${lang}/about`} class="btn btn-primary">
+            {t('services.cta.button')}
         </a>
     </div>
 </section>
@@ -68,33 +67,8 @@
         color: var(--color-text);
     }
 
-    /* Language Visibility */
-    .lang-en,
-    .lang-id {
-        display: none;
-        animation: fadeIn 0.3s ease;
-    }
-
-    :global(html:not([data-lang])) .lang-en {
-        display: block;
-    }
-
-    :global(html[data-lang="en"]) .lang-en {
-        display: block;
-    }
-
-    :global(html[data-lang="id"]) .lang-id {
-        display: block;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(5px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .btn-primary:hover {
+        background: transparent;
+        color: var(--color-text);
     }
 </style>

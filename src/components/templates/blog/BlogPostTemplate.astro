@@ -1,0 +1,223 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import { useTranslations } from "../../../i18n/utils";
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  lang: 'en' | 'id';
+}
+
+const { post, lang } = Astro.props;
+const t = useTranslations(lang);
+const { Content } = await post.render();
+
+const publishedTime = post.data.pubDate.toISOString();
+const updatedTime = post.data.updatedDate?.toISOString();
+
+const articleSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "datePublished": publishedTime,
+  ...(updatedTime ? { "dateModified": updatedTime } : {}),
+  "author": {
+    "@type": "Person",
+    "@id": "https://kodingus.com/#person",
+    "name": "Dedik",
+    "url": "https://kodingus.com"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Dedik",
+    "url": "https://kodingus.com"
+  },
+  ...(post.data.heroImage ? { "image": new URL(post.data.heroImage, Astro.site ?? Astro.url.origin).href } : {}),
+  "keywords": post.data.tags.join(", "),
+  "url": Astro.url.href
+});
+---
+
+<Layout
+  title={post.data.title}
+  description={post.data.description}
+  ogType="article"
+  publishedTime={publishedTime}
+  tags={post.data.tags}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={articleSchema} />
+  </Fragment>
+
+  <Header />
+  
+  <main>
+    <article>
+      <header>
+        <a href={lang === 'en' ? "/blog" : `/${lang}/blog`} class="back-link">
+          {t('blog.back')}
+        </a>
+        <div class="post-meta">
+          <time datetime={publishedTime}>
+            {post.data.pubDate.toLocaleDateString(lang === 'en' ? 'en-us' : 'id-ID', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </time>
+          {updatedTime && (
+            <span class="post-updated">
+              {t('blog.updated').replace('{date}', post.data.updatedDate!.toLocaleDateString(lang === 'en' ? 'en-us' : 'id-ID', { year: 'numeric', month: 'short', day: 'numeric' }))}
+            </span>
+          )}
+        </div>
+        <h1>
+          {post.data.title}
+        </h1>
+        {post.data.heroImage && (
+          <img
+            width={1020}
+            height={510}
+            src={post.data.heroImage}
+            alt={`Cover image for: ${post.data.title}`}
+          />
+        )}
+      </header>
+      
+      <div class="content">
+        <Content />
+      </div>
+    </article>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  article {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 3rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin: 1rem 0;
+    line-height: 1.2;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+    font-weight: 600;
+  }
+
+  .post-meta {
+    font-family: monospace;
+    color: var(--color-text-muted);
+  }
+
+  .post-updated {
+    display: block;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 0.25rem;
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-top: 2rem;
+  }
+
+  .content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+  }
+  
+  /* Markdown Content Styles */
+  .content :global(h2) {
+    font-size: 1.8rem;
+    margin-top: 2.5rem;
+  }
+  
+  .content :global(p) {
+    margin-bottom: 1.5rem;
+  }
+  
+  .content :global(ul) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  
+  .content :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .content :global(h3) {
+    font-size: 1.3rem;
+    margin-top: 2rem;
+  }
+
+  /* ── Shiki dual-theme: wire up CSS vars to site theme ── */
+  /* Shiki emits --shiki-light and --shiki-dark on each token span.
+     We map them to 'color' and 'background-color' based on data-theme. */
+  :global(html[data-theme='light']) :global(.astro-code),
+  :global(html[data-theme='light']) :global(.astro-code span) {
+    color: var(--shiki-light) !important;
+    background-color: var(--shiki-light-bg) !important;
+  }
+
+  :global(html[data-theme='dark']) :global(.astro-code),
+  :global(html[data-theme='dark']) :global(.astro-code span) {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+
+  /* ── Code block container (pre) ── */
+  .content :global(pre) {
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.75rem 0;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    border-left: 3px solid var(--color-border);
+    /* Tidy scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  .content :global(pre::-webkit-scrollbar) {
+    height: 6px;
+  }
+
+  .content :global(pre::-webkit-scrollbar-track) {
+    background: transparent;
+  }
+
+  .content :global(pre::-webkit-scrollbar-thumb) {
+    background-color: var(--color-border);
+    border-radius: 3px;
+  }
+
+  /* ── Inline code ── */
+  .content :global(:not(pre) > code) {
+    font-size: 0.875em;
+    padding: 0.15em 0.45em;
+    border-radius: 3px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    font-family: monospace;
+  }
+</style>

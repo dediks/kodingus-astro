@@ -1,0 +1,118 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import { useTranslations } from "../../../i18n/utils";
+
+interface Props {
+  post: CollectionEntry<'portfolio'>;
+  lang: 'en' | 'id';
+}
+
+const { post, lang } = Astro.props;
+const t = useTranslations(lang);
+const { Content } = await post.render();
+
+const creativeWorkSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  "name": post.data.title,
+  "description": post.data.description,
+  "dateCreated": post.data.pubDate.toISOString(),
+  "author": {
+    "@type": "Person",
+    "@id": "https://kodingus.com/#person",
+    "name": "Dedik",
+    "url": "https://kodingus.com"
+  },
+  ...(post.data.link ? { "url": post.data.link } : {}),
+  ...(post.data.heroImage ? { "image": new URL(post.data.heroImage, Astro.site ?? Astro.url.origin).href } : {}),
+  "keywords": post.data.tags.join(", ")
+});
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={creativeWorkSchema} />
+  </Fragment>
+
+  <Header />
+  
+  <main>
+    <article>
+      <header>
+        <a href={lang === 'en' ? "/portfolio" : `/${lang}/portfolio`} class="back-link">
+          {t('portfolio.back')}
+        </a>
+        <h1>
+          {post.data.title}
+        </h1>
+        {post.data.link && (
+          <a href={post.data.link} target="_blank" rel="noopener noreferrer" class="live-link">
+            {t('portfolio.visit')}
+          </a>
+        )}
+        {post.data.heroImage && (
+          <img
+            width={1020}
+            height={510}
+            src={post.data.heroImage}
+            alt={`Preview of project: ${post.data.title}`}
+          />
+        )}
+      </header>
+      
+      <div class="content">
+        <Content />
+      </div>
+    </article>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  article {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  h1 {
+    font-size: 3rem;
+    margin: 1rem 0;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .live-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--color-text);
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-top: 1rem;
+  }
+
+  .content {
+    line-height: 1.8;
+  }
+</style>

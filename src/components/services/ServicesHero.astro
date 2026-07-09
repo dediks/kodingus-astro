@@ -1,22 +1,20 @@
 ---
+import { useTranslations } from "../../i18n/utils";
 
+interface Props {
+    lang: 'en' | 'id';
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
 ---
 
 <section class="services-hero">
     <h1 class="hero-title">
-        <span class="lang-en">OUR SERVICES</span>
-        <span class="lang-id">LAYANAN KAMI</span>
+        {t('services.hero.title_part1')}<br />{t('services.hero.title_part2')}<br />{t('services.hero.title_part3')}
     </h1>
     <p class="hero-subtitle">
-        <span class="lang-en">
-            Comprehensive digital solutions tailored to your needs. We handle
-            everything from initial design to final deployment.
-        </span>
-        <span class="lang-id">
-            Solusi digital komprehensif yang disesuaikan dengan kebutuhan Anda.
-            Kami menangani semuanya mulai dari desain awal hingga peluncuran
-            akhir.
-        </span>
+        {t('services.hero.subtitle')}
     </p>
 </section>
 
@@ -39,35 +37,5 @@
         max-width: 600px;
         color: var(--color-text-muted);
         line-height: 1.6;
-    }
-
-    /* Language Visibility */
-    .lang-en,
-    .lang-id {
-        display: none;
-        animation: fadeIn 0.3s ease;
-    }
-
-    :global(html:not([data-lang])) .lang-en {
-        display: block;
-    }
-
-    :global(html[data-lang="en"]) .lang-en {
-        display: block;
-    }
-
-    :global(html[data-lang="id"]) .lang-id {
-        display: block;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(5px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
 </style>

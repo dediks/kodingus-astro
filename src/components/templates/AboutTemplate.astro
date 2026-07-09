@@ -1,0 +1,207 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import SocialLinks from "../../components/SocialLinks.astro";
+import { useTranslations } from "../../i18n/utils";
+
+interface Props {
+  lang: 'en' | 'id';
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const title = "About - Kodingus";
+const description = "Learn more about Dedik, a web developer and designer.";
+---
+
+<Layout title={title} description={description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "@id": "https://kodingus.com/#person",
+      "name": "Dedik",
+      "url": "https://kodingus.com",
+      "jobTitle": "Full-Stack Creative Developer",
+      "description": "Full-stack developer handling design, development, and deployment — all in one, from Indonesia.",
+      "knowsAbout": ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Next.js", "Astro", "Node.js", "UI/UX Design", "SEO"]
+    })} />
+  </Fragment>
+
+  <Header />
+
+  <main>
+    <section class="about-section">
+      <h1 class="visually-hidden">
+        {t('about.hidden_title')}
+      </h1>
+      <div class="profile-container">
+        <img
+          src="/profile.jpg"
+          alt="Ded Profile Picture"
+          class="profile-image"
+        />
+        <span class="profile-text">Ded.</span>
+      </div>
+
+      <div class="bio-content">
+        <div>
+          <p class="lead">
+            {t('about.lead')}
+          </p>
+
+          <p>
+            {t('about.p1')}
+          </p>
+
+          <p>
+            {t('about.p2')}
+          </p>
+
+          <p>
+            {t('about.p3')}
+          </p>
+
+          <div class="skills-container">
+            <h2>{t('about.skills_title')}</h2>
+            <ul class="skills-list">
+              <li>HTML & CSS</li>
+              <li>JavaScript / TypeScript</li>
+              <li>React & Next.js</li>
+              <li>Astro</li>
+              <li>Node.js</li>
+              <li>Git & GitHub</li>
+              <li>SQL & NoSQL</li>
+              <li>Tailwind CSS</li>
+              <li>REST & GraphQL</li>
+              <li>Performance Tuning</li>
+              <li>SEO Best Practices</li>
+              <li>UI/UX Design</li>
+            </ul>
+          </div>
+
+          <div class="contact-methods">
+            <h2>{t('about.contact_title')}</h2>
+            <p>
+              {t('about.contact_text')}
+            </p>
+            <SocialLinks layout="card" />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .about-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .about-section {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
+  .profile-container {
+    position: relative;
+    width: fit-content;
+    /* Removed margin: 0 auto; to align left with layout */
+  }
+
+  .profile-image {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 4px;
+    filter: grayscale(100%);
+    border: 1px solid var(--color-border);
+    display: block;
+  }
+
+  .profile-text {
+    position: absolute;
+    bottom: -1rem;
+    right: -2rem;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 4rem;
+    color: var(--color-text);
+    z-index: 10;
+    line-height: 1;
+    background: var(--color-bg); /* Optional: to make it pop over grid lines */
+    padding: 0 0.5rem;
+  }
+
+  h1 {
+    font-size: 3rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    margin-top: 2.5rem;
+  }
+
+  .lead {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+  }
+
+  .skills-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .skills-list li {
+    background: var(--color-bg-alt);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-border);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .contact-methods {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* Visually hidden but accessible to search engines & screen readers */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

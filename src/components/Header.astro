@@ -1,11 +1,18 @@
 ---
+import { getLangFromUrl, useTranslations, getAlternateUrl } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const alternateLang = lang === 'en' ? 'id' : 'en';
+const alternateUrl = getAlternateUrl(Astro.url, alternateLang);
+
 const links = [
-  { href: "/", labelEn: "Home", labelId: "Beranda" },
-  { href: "/services", labelEn: "Services", labelId: "Layanan" },
-  { href: "/portfolio", labelEn: "Portfolio", labelId: "Portofolio" },
-  { href: "/blog", labelEn: "Blog", labelId: "Blog" },
-  { href: "/about", labelEn: "About", labelId: "Tentang" },
-];
+  { href: lang === 'en' ? "/" : `/${lang}/`, key: "nav.home" },
+  { href: lang === 'en' ? "/services" : `/${lang}/services`, key: "nav.services" },
+  { href: lang === 'en' ? "/portfolio" : `/${lang}/portfolio`, key: "nav.portfolio" },
+  { href: lang === 'en' ? "/blog" : `/${lang}/blog`, key: "nav.blog" },
+  { href: lang === 'en' ? "/about" : `/${lang}/about`, key: "nav.about" },
+] as const;
 ---
 
 <header class="header">
@@ -28,12 +35,11 @@ const links = [
           links.map((link) => {
             const isActive =
               Astro.url.pathname === link.href ||
-              (link.href !== "/" && Astro.url.pathname.startsWith(link.href));
+              (link.href !== (lang === 'en' ? "/" : `/${lang}/`) && Astro.url.pathname.startsWith(link.href));
             return (
               <li>
                 <a href={link.href} class={isActive ? "active" : ""}>
-                  <span class="lang-en">{link.labelEn}</span>
-                  <span class="lang-id">{link.labelId}</span>
+                  {t(link.key)}
                 </a>
               </li>
             );
@@ -42,11 +48,9 @@ const links = [
       </ul>
       <div class="nav-controls">
         <div class="lang-toggle">
-          <button id="lang-btn-en" class="active" aria-label="Switch to English"
-            >EN</button
-          >
-          <span class="separator">/</span>
-          <button id="lang-btn-id" aria-label="Switch to Indonesia">ID</button>
+          <a href={alternateUrl} aria-label={`Switch to ${alternateLang.toUpperCase()}`}>
+            {lang === 'en' ? 'ID' : 'EN'}
+          </a>
         </div>
 
         <button
@@ -98,40 +102,7 @@ const links = [
     }
   }
 
-  // Global Language Logic
-  function initLanguage() {
-    const btnEn = document.getElementById("lang-btn-en");
-    const btnId = document.getElementById("lang-btn-id");
-
-    function setLanguage(lang: string) {
-      localStorage.setItem("language", lang);
-      document.documentElement.setAttribute("data-lang", lang);
-      // Keep html[lang] in sync for a11y and SEO
-      document.documentElement.setAttribute("lang", lang);
-
-      if (lang === "en") {
-        btnEn?.classList.add("active");
-        btnId?.classList.remove("active");
-      } else {
-        btnId?.classList.add("active");
-        btnEn?.classList.remove("active");
-      }
-    }
-
-    const savedLang = localStorage.getItem("language") || "en";
-    setLanguage(savedLang);
-
-    if (btnEn && btnId) {
-      // Clean up old listeners to prevent duplicates on view transition
-      const newBtnEn = btnEn.cloneNode(true) as HTMLElement;
-      const newBtnId = btnId.cloneNode(true) as HTMLElement;
-      btnEn.parentNode?.replaceChild(newBtnEn, btnEn);
-      btnId.parentNode?.replaceChild(newBtnId, btnId);
-
-      newBtnEn.addEventListener("click", () => setLanguage("en"));
-      newBtnId.addEventListener("click", () => setLanguage("id"));
-    }
-  }
+  // Global Language Logic removed - now using server-side routing
 
   // Dark Mode Logic
   function initTheme() {
@@ -160,13 +131,11 @@ const links = [
 
   // Run on initial load
   initMobileMenu();
-  initLanguage();
   initTheme();
 
   // Run on view transitions navigation
   document.addEventListener("astro:page-load", () => {
     initMobileMenu();
-    initLanguage();
     initTheme();
   });
 </script>
@@ -250,27 +219,17 @@ const links = [
     font-weight: 700;
   }
 
-  .lang-toggle button {
-    background: none;
-    border: none;
-    cursor: pointer;
+  .lang-toggle a {
     font-family: inherit;
     font-size: 0.9rem;
     font-weight: inherit;
     color: var(--color-text-muted);
-    padding: 0;
+    text-decoration: none;
     transition: color 0.2s ease;
   }
 
-  .lang-toggle button.active {
+  .lang-toggle a:hover {
     color: var(--color-text);
-    text-decoration: underline;
-  }
-
-  .separator {
-    margin: 0 0.3rem;
-    color: var(--color-text-muted);
-    font-size: 0.9rem;
   }
 
   /* Theme Toggle Styles */
@@ -388,20 +347,5 @@ const links = [
 
   :global(body.no-scroll) {
     overflow: hidden;
-  }
-
-  /* Global Language Visibility */
-  :global(.lang-en),
-  :global(.lang-id) {
-    display: none;
-  }
-
-  :global(html:not([data-lang])) :global(.lang-en),
-  :global(html[data-lang="en"]) :global(.lang-en) {
-    display: block;
-  }
-
-  :global(html[data-lang="id"]) :global(.lang-id) {
-    display: block;
   }
 </style>

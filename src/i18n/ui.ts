@@ -1,0 +1,133 @@
+export const languages = {
+  en: 'English',
+  id: 'Bahasa Indonesia',
+};
+
+export const defaultLang = 'en';
+
+export const ui = {
+  en: {
+    'nav.home': 'Home',
+    'nav.services': 'Services',
+    'nav.portfolio': 'Portfolio',
+    'nav.blog': 'Blog',
+    'nav.about': 'About',
+    
+    'home.hero.title_part1': 'YOUR',
+    'home.hero.adaptive': 'ADAPTIVE',
+    'home.hero.dedicated': 'DEDICATED',
+    'home.hero.title_part2': 'DIGITAL PARTNER',
+    'home.hero.subtitle': 'Full-stack developer handling design, development, and deployment — all in one.',
+    'home.cta.view_work': 'View Work',
+    'home.cta.about_me': 'About Me',
+    'home.selected_work': 'SELECTED WORK',
+    'home.see_all': 'See All →',
+    'home.latest_writings': 'LATEST WRITINGS',
+    'home.no_projects': 'Projects coming soon...',
+    'home.no_articles': 'No articles yet. Stay tuned!',
+    
+    'blog.heading': 'Writings — Web Dev, AI & Design',
+    'blog.back': '← Back to Writings',
+    'blog.updated': '(Updated: {date})',
+    
+    'portfolio.heading': 'Portfolio — Engineering, Design & Creativity',
+    'portfolio.back': '← Back to Portfolio',
+    'portfolio.visit': 'Visit Project →',
+    'portfolio.no_projects': 'No projects found. Check back later!',
+    
+    'about.hidden_title': 'About Dedik — Full-Stack Creative Developer',
+    'about.lead': 'From Design to Deployment. I am Dedik, a Full-Stack Creative Developer — your adaptive digital partner.',
+    'about.p1': 'I handle everything from design, development, to deployment. You don\'t need to coordinate with separate designers, developers, and hosting providers — I\'ve got it all covered under one roof.',
+    'about.p2': 'As a generalist who can design AND build, I ensure your vision stays consistent from concept to launch. No miscommunication between teams, no lost-in-translation designs — just seamless execution.',
+    'about.p3': 'Whether you need a stunning landing page, a web application, or a complete digital presence — I\'m your single point of contact for getting things done.',
+    'about.skills_title': 'SKILLS & TOOLS',
+    'about.contact_title': 'GET IN TOUCH',
+    'about.contact_text': 'Interested in working together or just want to say hi? Feel free to reach out via email or social media.',
+    
+    'services.hero.title_part1': 'COMPREHENSIVE',
+    'services.hero.title_part2': 'DIGITAL',
+    'services.hero.title_part3': 'SOLUTIONS',
+    'services.hero.subtitle': 'From concept to deployment, I provide end-to-end services to elevate your digital presence and solve complex business problems.',
+    'services.hero.cta': 'Discuss Your Project',
+    
+    'services.list.web_dev': 'Web Development',
+    'services.list.web_dev_desc': 'Custom, high-performance web applications built with modern frameworks like React, Next.js, and Astro. From simple landing pages to complex enterprise platforms.',
+    'services.list.ui_ux': 'UI/UX Design',
+    'services.list.ui_ux_desc': 'User-centered design that balances aesthetics with functionality. I create intuitive interfaces that engage users and drive conversions.',
+    'services.list.deployment': 'Deployment & DevOps',
+    'services.list.deployment_desc': 'Seamless deployment pipelines, cloud infrastructure setup, and performance optimization to ensure your application runs smoothly 24/7.',
+    'services.list.seo': 'SEO & Performance',
+    'services.list.seo_desc': 'Technical SEO optimization, core web vitals improvement, and performance tuning to help your site rank higher and load faster.',
+    
+    'services.cta.title': "Let's Build Something",
+    'services.cta.highlight': 'Together',
+    'services.cta.subtitle': 'Ready to start your next project? Get in touch and let\'s turn your vision into reality.',
+    'services.cta.button': 'Contact Me Now',
+    
+    'footer.made_with': 'Made with',
+    'footer.by': 'by Dedik',
+    'footer.all_rights': 'All rights reserved.',
+  },
+  id: {
+    'nav.home': 'Beranda',
+    'nav.services': 'Layanan',
+    'nav.portfolio': 'Portofolio',
+    'nav.blog': 'Blog',
+    'nav.about': 'Tentang',
+    
+    'home.hero.title_part1': 'PARTNER DIGITAL',
+    'home.hero.adaptive': 'ADAPTIF',
+    'home.hero.dedicated': 'BERDEDIKASI',
+    'home.hero.title_part2': 'ANDA',
+    'home.hero.subtitle': 'Full-stack developer yang menangani desain, development, dan deployment — semuanya dalam satu.',
+    'home.cta.view_work': 'Lihat Karya',
+    'home.cta.about_me': 'Tentang Saya',
+    'home.selected_work': 'KARYA PILIHAN',
+    'home.see_all': 'Lihat Semua →',
+    'home.latest_writings': 'TULISAN TERBARU',
+    'home.no_projects': 'Proyek akan segera hadir...',
+    'home.no_articles': 'Belum ada artikel. Pantau terus!',
+    
+    'blog.heading': 'Tulisan — Web Dev, AI & Desain',
+    'blog.back': '← Kembali ke Tulisan',
+    'blog.updated': '(Diperbarui: {date})',
+    
+    'portfolio.heading': 'Portofolio — Engineering, Desain & Kreativitas',
+    'portfolio.back': '← Kembali ke Portofolio',
+    'portfolio.visit': 'Kunjungi Proyek →',
+    'portfolio.no_projects': 'Belum ada proyek. Cek lagi nanti!',
+    
+    'about.hidden_title': 'Tentang Dedik — Full-Stack Creative Developer',
+    'about.lead': 'Dari Desain hingga Deployment. Saya Dedik, Full-Stack Creative Developer — partner digital adaptif Anda.',
+    'about.p1': 'Saya mengurus semuanya dari desain, development, sampai deployment. Anda tidak perlu koordinasi dengan designer, developer, dan provider hosting terpisah — semuanya saya tangani.',
+    'about.p2': 'Sebagai generalist yang bisa desain DAN build, saya memastikan visi Anda tetap konsisten dari konsep sampai launch. Tidak ada miskomunikasi antar tim, tidak ada desain yang "hilang dalam terjemahan" — hanya eksekusi yang mulus.',
+    'about.p3': 'Baik Anda butuh landing page yang memukau, web application, atau kehadiran digital yang lengkap — saya adalah satu-satunya kontak yang Anda butuhkan untuk menyelesaikan semuanya.',
+    'about.skills_title': 'KEAHLIAN & ALAT',
+    'about.contact_title': 'HUBUNGI SAYA',
+    'about.contact_text': 'Tertarik untuk bekerja sama atau sekadar menyapa? Jangan ragu untuk menghubungi saya melalui email atau media sosial.',
+    
+    'services.hero.title_part1': 'SOLUSI',
+    'services.hero.title_part2': 'DIGITAL',
+    'services.hero.title_part3': 'KOMPREHENSIF',
+    'services.hero.subtitle': 'Dari konsep hingga deployment, saya menyediakan layanan end-to-end untuk meningkatkan kehadiran digital Anda dan memecahkan masalah bisnis yang kompleks.',
+    'services.hero.cta': 'Diskusikan Proyek Anda',
+    
+    'services.list.web_dev': 'Web Development',
+    'services.list.web_dev_desc': 'Aplikasi web kustom berperforma tinggi yang dibangun dengan framework modern seperti React, Next.js, dan Astro. Dari landing page sederhana hingga platform enterprise kompleks.',
+    'services.list.ui_ux': 'UI/UX Design',
+    'services.list.ui_ux_desc': 'Desain berpusat pada pengguna yang menyeimbangkan estetika dengan fungsionalitas. Saya membuat antarmuka intuitif yang melibatkan pengguna dan mendorong konversi.',
+    'services.list.deployment': 'Deployment & DevOps',
+    'services.list.deployment_desc': 'Pipeline deployment yang mulus, penyiapan infrastruktur cloud, dan pengoptimalan kinerja untuk memastikan aplikasi Anda berjalan lancar 24/7.',
+    'services.list.seo': 'SEO & Performa',
+    'services.list.seo_desc': 'Pengoptimalan SEO teknis, peningkatan core web vitals, dan penyesuaian kinerja untuk membantu situs Anda mendapat peringkat lebih tinggi dan memuat lebih cepat.',
+    
+    'services.cta.title': "Mari Bangun Sesuatu",
+    'services.cta.highlight': 'Bersama',
+    'services.cta.subtitle': 'Siap untuk memulai proyek Anda berikutnya? Hubungi saya dan mari wujudkan visi Anda menjadi kenyataan.',
+    'services.cta.button': 'Hubungi Saya Sekarang',
+    
+    'footer.made_with': 'Dibuat dengan',
+    'footer.by': 'oleh Dedik',
+    'footer.all_rights': 'Hak cipta dilindungi.',
+  },
+} as const;

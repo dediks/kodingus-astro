@@ -1,0 +1,130 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import { getCollection } from 'astro:content';
+import { useTranslations } from "../../../i18n/utils";
+
+interface Props {
+  lang: 'en' | 'id';
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const title = "Blog - Kodingus";
+const description = "Thoughts on code, AI, and the art of creation.";
+
+const posts = (await getCollection('blog'))
+  .filter((post) => post.slug.startsWith(`${lang}/`))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<Layout title={title} description={description}>
+  <Header />
+  
+  <main>
+    <section>
+      <h1>
+        {t('blog.heading')}
+      </h1>
+      <ul class="post-list">
+        {posts.length > 0 ? (
+          posts.map((post) => {
+            const [, ...slugParts] = post.slug.split('/');
+            const slug = slugParts.join('/');
+            return (
+              <li>
+                <a href={lang === 'en' ? `/blog/${slug}` : `/${lang}/blog/${slug}`}>
+                  <span class="post-date">
+                    {post.data.pubDate.toLocaleDateString(lang === 'en' ? 'en-us' : 'id-ID', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </span>
+                  <span class="post-title">
+                    {post.data.title}
+                  </span>
+                </a>
+              </li>
+            );
+          })
+        ) : (
+          <li class="empty-state">
+            {t('home.no_articles')}
+          </li>
+        )}
+      </ul>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+  }
+
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .post-list li {
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 1rem;
+    margin: 0 -1rem;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  .post-list li:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-text);
+    box-shadow: 4px 4px 0px var(--color-text);
+  }
+
+  .post-list a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 1.5rem 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .post-list a:hover {
+    text-decoration: none;
+    opacity: 1;
+  }
+
+  .post-date {
+    font-family: monospace;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-right: 2rem;
+    min-width: 120px;
+  }
+
+  .post-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .empty-state {
+    text-align: center;
+    font-style: italic;
+    color: var(--color-text-muted);
+    padding: 3rem;
+    background: var(--color-bg-alt);
+    border-radius: 4px;
+    list-style: none;
+    border-bottom: none !important;
+  }
+</style>

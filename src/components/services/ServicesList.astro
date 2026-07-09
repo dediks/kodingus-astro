@@ -1,5 +1,12 @@
 ---
+import { useTranslations } from "../../i18n/utils";
 
+interface Props {
+    lang: 'en' | 'id';
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
 ---
 
 <section class="services-grid" aria-label="Our Digital Services">
@@ -21,49 +28,10 @@
         </div>
         <div class="service-content">
             <h2>
-                <span class="lang-en">WEB DEVELOPMENT</span>
-                <span class="lang-id">PENGEMBANGAN WEB</span>
+                {t('services.list.web_dev')}
             </h2>
-            <p class="lang-en">
-                Custom, high-performance web applications built with modern
-                technologies like React, Next.js, and Astro designed to scale.
-            </p>
-            <p class="lang-id">
-                Aplikasi web kustom berskala tinggi yang dibangun dengan
-                teknologi modern seperti React, Next.js, dan Astro.
-            </p>
-        </div>
-    </article>
-
-    <article class="service-card">
-        <div class="service-icon" aria-hidden="true">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                ><rect x="5" y="2" width="14" height="20" rx="2" ry="2"
-                ></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg
-            >
-        </div>
-        <div class="service-content">
-            <h2>
-                <span class="lang-en">MOBILE DEVELOPMENT</span>
-                <span class="lang-id">PENGEMBANGAN MOBILE</span>
-            </h2>
-            <p class="lang-en">
-                Cross-platform and native mobile applications tailored for iOS
-                and Android, ensuring engaging user experiences everywhere.
-            </p>
-            <p class="lang-id">
-                Aplikasi mobile lintas platform dan native yang disesuaikan
-                untuk iOS dan Android, memastikan pengalaman menarik di mana
-                saja.
+            <p>
+                {t('services.list.web_dev_desc')}
             </p>
         </div>
     </article>
@@ -87,47 +55,10 @@
         </div>
         <div class="service-content">
             <h2>
-                <span class="lang-en">UI/UX DESIGN</span>
-                <span class="lang-id">DESAIN UI/UX</span>
+                {t('services.list.ui_ux')}
             </h2>
-            <p class="lang-en">
-                Intuitive interfaces and comprehensive user research focused on
-                conversion, usability, and visual delight.
-            </p>
-            <p class="lang-id">
-                Antarmuka pengguna yang intuitif dan riset pengguna komprehensif
-                yang berfokus pada konversi, kegunaan, dan keindahan.
-            </p>
-        </div>
-    </article>
-
-    <article class="service-card">
-        <div class="service-icon" aria-hidden="true">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                ><path d="M2 12h4l3-9 5 18 3-9h5"></path></svg
-            >
-        </div>
-        <div class="service-content">
-            <h2>
-                <span class="lang-en">BRAND IDENTITY</span>
-                <span class="lang-id">IDENTITAS MEREK</span>
-            </h2>
-            <p class="lang-en">
-                Cohesive brand guidelines, memorable logo designs, and curated
-                typography sets that communicate your unique value.
-            </p>
-            <p class="lang-id">
-                Pedoman merek yang kohesif, desain logo yang mudah diingat, dan
-                set tipografi yang mengkomunikasikan nilai unik Anda.
+            <p>
+                {t('services.list.ui_ux_desc')}
             </p>
         </div>
     </article>
@@ -150,16 +81,10 @@
         </div>
         <div class="service-content">
             <h2>
-                <span class="lang-en">CLOUD & DEVOPS</span>
-                <span class="lang-id">CLOUD & DEVOPS</span>
+                {t('services.list.deployment')}
             </h2>
-            <p class="lang-en">
-                Reliable hosting architecture, CI/CD pipeline automation, and
-                server maintenance for 99.9% application uptime.
-            </p>
-            <p class="lang-id">
-                Arsitektur hosting yang andal, otomatisasi pipeline CI/CD, dan
-                pemeliharaan server untuk ketersediaan aplikasi 99,9%.
+            <p>
+                {t('services.list.deployment_desc')}
             </p>
         </div>
     </article>
@@ -186,86 +111,10 @@
         </div>
         <div class="service-content">
             <h2>
-                <span class="lang-en">SEO OPTIMIZATION</span>
-                <span class="lang-id">OPTIMASI SEO</span>
+                {t('services.list.seo')}
             </h2>
-            <p class="lang-en">
-                Data-driven strategies for high organic visibility. We implement
-                critical on-page, technical, and off-page SEO standards.
-            </p>
-            <p class="lang-id">
-                Strategi berbasis data untuk visibilitas organik tinggi. Kami
-                menerapkan standar SEO on-page, teknis, dan off-page yang
-                kritis.
-            </p>
-        </div>
-    </article>
-
-    <article class="service-card">
-        <div class="service-icon" aria-hidden="true">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                ><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
-                ></polygon></svg
-            >
-        </div>
-        <div class="service-content">
-            <h2>
-                <span class="lang-en">PERFORMANCE IMPROVEMENT</span>
-                <span class="lang-id">PENINGKATAN PERFORMA</span>
-            </h2>
-            <p class="lang-en">
-                Comprehensive audits to reduce load times, master Core Web
-                Vitals, and guarantee smooth cross-device framerates.
-            </p>
-            <p class="lang-id">
-                Audit komprehensif untuk mengurangi waktu muat, menguasai Core
-                Web Vitals, dan menjamin kelancaran lintas perangkat.
-            </p>
-        </div>
-    </article>
-
-    <article class="service-card">
-        <div class="service-icon" aria-hidden="true">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                ><rect x="2" y="2" width="20" height="8" rx="2" ry="2"
-                ></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"
-                ></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line
-                    x1="6"
-                    y1="18"
-                    x2="6.01"
-                    y2="18"></line></svg
-            >
-        </div>
-        <div class="service-content">
-            <h2>
-                <span class="lang-en">AI & AUTOMATION</span>
-                <span class="lang-id">AI & OTOMATISASI</span>
-            </h2>
-            <p class="lang-en">
-                Smart API integrations, AI-powered chatbots, and workflow
-                automations to modernize backend business logic.
-            </p>
-            <p class="lang-id">
-                Integrasi API cerdas, chatbot bertenaga AI, dan otomatisasi alur
-                kerja untuk memodernisasi logika bisnis backend.
+            <p>
+                {t('services.list.seo_desc')}
             </p>
         </div>
     </article>
@@ -343,35 +192,5 @@
         line-height: 1.7;
         color: var(--color-text-muted);
         margin: 0;
-    }
-
-    /* Language Visibility */
-    .lang-en,
-    .lang-id {
-        display: none;
-        animation: fadeIn 0.3s ease;
-    }
-
-    :global(html:not([data-lang])) .lang-en {
-        display: block;
-    }
-
-    :global(html[data-lang="en"]) .lang-en {
-        display: block;
-    }
-
-    :global(html[data-lang="id"]) .lang-id {
-        display: block;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(5px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
 </style>

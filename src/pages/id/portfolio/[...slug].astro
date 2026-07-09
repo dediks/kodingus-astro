@@ -1,0 +1,17 @@
+---
+import { getCollection } from 'astro:content';
+import PortfolioPostTemplate from "../../../components/templates/portfolio/PortfolioPostTemplate.astro";
+
+export async function getStaticPaths() {
+	const posts = await getCollection('portfolio');
+  const idPosts = posts.filter(post => post.slug.startsWith('id/'));
+	return idPosts.map((post) => ({
+		params: { slug: post.slug.replace('id/', '') },
+		props: post,
+	}));
+}
+
+const post = Astro.props;
+---
+
+<PortfolioPostTemplate post={post} lang="id" />

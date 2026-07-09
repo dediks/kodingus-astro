@@ -20,7 +20,7 @@ const portfolio = defineCollection({
         pubDate: z.date(),
         heroImage: z.string().optional(),
         tags: z.array(z.string()).default([]),
-        link: z.string().url().optional(), // Link to live project
+        link: z.string().url().optional(),
     }),
 });
 

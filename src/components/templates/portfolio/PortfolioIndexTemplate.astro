@@ -1,0 +1,80 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import ProjectCard from '../../../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+import { useTranslations } from "../../../i18n/utils";
+
+interface Props {
+  lang: 'en' | 'id';
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const title = "Portfolio - Kodingus";
+const description = "Selected work showcasing engineering, design, and creativity.";
+
+const projects = (await getCollection('portfolio'))
+  .filter((project) => project.slug.startsWith(`${lang}/`))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<Layout title={title} description={description}>
+  <Header />
+  
+  <main>
+    <section>
+      <h1>
+        {t('portfolio.heading')}
+      </h1>
+      <div class="project-grid">
+        {projects.length > 0 ? (
+          projects.map((project) => {
+            const [, ...slugParts] = project.slug.split('/');
+            const slug = slugParts.join('/');
+            return (
+              <ProjectCard
+                title={project.data.title}
+                description={project.data.description}
+                tags={project.data.tags}
+                href={lang === 'en' ? `/portfolio/${slug}` : `/${lang}/portfolio/${slug}`}
+              />
+            );
+          })
+        ) : (
+          <p class="empty-state">
+            {t('portfolio.no_projects')}
+          </p>
+        )}
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-style: italic;
+    color: var(--color-text-muted);
+    padding: 3rem;
+    background: var(--color-bg-alt);
+    border-radius: 4px;
+  }
+</style>
