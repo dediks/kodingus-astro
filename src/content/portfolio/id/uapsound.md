@@ -2,7 +2,7 @@
 title: "UAP Sound — Produsen Loudspeaker Profesional"
 description: "Website perusahaan dan katalog produk untuk UAProfessional (UAP Sound), produsen terkemuka asal Indonesia untuk loudspeaker dan peralatan audio profesional berkinerja tinggi."
 pubDate: 2025-10-15
-tags: ["Next.js", "React", "Tailwind CSS", "Website Perusahaan", "Katalog Produsen", "Optimasi SEO"]
+tags: ["Next.js", "React", "Tailwind CSS", "Website Perusahaan", "Katalog Produsen", "Optimasi SEO", "CMS Kustom"]
 link: "https://uapsound.com"
 ---
 
@@ -15,6 +15,7 @@ Proyek ini melibatkan perancangan dan pengembangan website resmi serta katalog p
 ## Fitur Utama
 
 - 🔊 **Katalog Produk Dinamis** — Halaman produk detail yang menyajikan spesifikasi teknis, grafik respons frekuensi, dan panduan penerapan.
+- 🛠️ **CMS Kustom** — Membangun Sistem Manajemen Konten khusus yang memungkinkan tim UAP Sound untuk memperbarui spesifikasi produk, menambah lini produk baru, dan mengelola konten website dengan mudah tanpa bantuan developer.
 - 📈 **Optimasi SEO** — Implementasi SEO teknis komprehensif, data terstruktur (JSON-LD), dan metadata yang dioptimalkan untuk memastikan visibilitas tinggi di mesin pencari untuk kategori produk spesifik mereka.
 - 📱 **Desain Sepenuhnya Responsif** — Dioptimalkan untuk tampilan desktop maupun seluler, memastikan pengalaman yang mulus bagi para engineer audio di lapangan.
 - ⚡ **Performa Tinggi** — Dibangun menggunakan teknologi web modern untuk menjamin waktu muat yang cepat dan navigasi yang lancar.
