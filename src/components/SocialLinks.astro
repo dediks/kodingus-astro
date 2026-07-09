@@ -63,7 +63,7 @@ const socialLinks = [
                     href={link.href}
                     class={`social-link ${link.id}`}
                     target={link.external ? "_blank" : undefined}
-                    rel={link.external ? "noopener noreferrer" : undefined}
+                    rel={link.external ? "nofollow noopener noreferrer" : undefined}
                     aria-label={link.label}
                 >
                     <Fragment set:html={link.svg} />
@@ -78,7 +78,7 @@ const socialLinks = [
                     href={link.href}
                     class={`social-icon ${link.id}`}
                     target={link.external ? "_blank" : undefined}
-                    rel={link.external ? "noopener noreferrer" : undefined}
+                    rel={link.external ? "nofollow noopener noreferrer" : undefined}
                     aria-label={link.label}
                 >
                     <Fragment set:html={link.svg} />
