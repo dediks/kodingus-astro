@@ -20,6 +20,30 @@ const latestPosts = (await getCollection("blog"))
 ---
 
 <Layout title={title} description={description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://kodingus.com/#person",
+          "name": "Dedik",
+          "url": "https://kodingus.com",
+          "jobTitle": "Full-Stack Creative Developer",
+          "description": "Full-stack developer handling design, development, and deployment — all in one."
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://kodingus.com/#website",
+          "url": "https://kodingus.com",
+          "name": "Kodingus",
+          "description": "Full-Stack Creative Developer. Design, build, and deploy — all in one.",
+          "author": { "@id": "https://kodingus.com/#person" }
+        }
+      ]
+    })} />
+  </Fragment>
+
   <Header />
 
   <main>

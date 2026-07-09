@@ -14,9 +14,30 @@ export async function getStaticPaths() {
 
 const post = Astro.props;
 const { Content } = await post.render();
+
+const creativeWorkSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  "name": post.data.title,
+  "description": post.data.description,
+  "dateCreated": post.data.pubDate.toISOString(),
+  "author": {
+    "@type": "Person",
+    "@id": "https://kodingus.com/#person",
+    "name": "Dedik",
+    "url": "https://kodingus.com"
+  },
+  ...(post.data.link ? { "url": post.data.link } : {}),
+  ...(post.data.heroImage ? { "image": new URL(post.data.heroImage, Astro.site ?? Astro.url.origin).href } : {}),
+  "keywords": post.data.tags.join(", ")
+});
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={creativeWorkSchema} />
+  </Fragment>
+
   <Header />
   
   <main>
@@ -33,7 +54,14 @@ const { Content } = await post.render();
             <span class="lang-id">Kunjungi Proyek &rarr;</span>
           </a>
         )}
-        {post.data.heroImage && <img width={1020} height={510} src={post.data.heroImage} alt="" />}
+        {post.data.heroImage && (
+          <img
+            width={1020}
+            height={510}
+            src={post.data.heroImage}
+            alt={`Preview of project: ${post.data.title}`}
+          />
+        )}
       </header>
       
       <div class="content">

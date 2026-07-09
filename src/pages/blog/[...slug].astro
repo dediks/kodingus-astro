@@ -14,9 +14,45 @@ export async function getStaticPaths() {
 
 const post = Astro.props;
 const { Content } = await post.render();
+
+const publishedTime = post.data.pubDate.toISOString();
+const updatedTime = post.data.updatedDate?.toISOString();
+
+const articleSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "datePublished": publishedTime,
+  ...(updatedTime ? { "dateModified": updatedTime } : {}),
+  "author": {
+    "@type": "Person",
+    "@id": "https://kodingus.com/#person",
+    "name": "Dedik",
+    "url": "https://kodingus.com"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Dedik",
+    "url": "https://kodingus.com"
+  },
+  ...(post.data.heroImage ? { "image": new URL(post.data.heroImage, Astro.site ?? Astro.url.origin).href } : {}),
+  "keywords": post.data.tags.join(", "),
+  "url": Astro.url.href
+});
 ---
 
-<Layout title={post.data.title} description={post.data.description}>
+<Layout
+  title={post.data.title}
+  description={post.data.description}
+  ogType="article"
+  publishedTime={publishedTime}
+  tags={post.data.tags}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={articleSchema} />
+  </Fragment>
+
   <Header />
   
   <main>
@@ -27,7 +63,7 @@ const { Content } = await post.render();
           <span class="lang-id">&larr; Kembali ke Tulisan</span>
         </a>
         <div class="post-meta">
-          <time datetime={post.data.pubDate.toISOString()}>
+          <time datetime={publishedTime}>
             <span class="lang-en">
               {post.data.pubDate.toLocaleDateString('en-us', {
                 year: 'numeric',
@@ -43,9 +79,22 @@ const { Content } = await post.render();
               })}
             </span>
           </time>
+          {updatedTime && (
+            <span class="post-updated">
+              <span class="lang-en">(Updated: {post.data.updatedDate!.toLocaleDateString('en-us', { year: 'numeric', month: 'short', day: 'numeric' })})</span>
+              <span class="lang-id">(Diperbarui: {post.data.updatedDate!.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })})</span>
+            </span>
+          )}
         </div>
         <h1>{post.data.title}</h1>
-        {post.data.heroImage && <img width={1020} height={510} src={post.data.heroImage} alt="" />}
+        {post.data.heroImage && (
+          <img
+            width={1020}
+            height={510}
+            src={post.data.heroImage}
+            alt={`Cover image for: ${post.data.title}`}
+          />
+        )}
       </header>
       
       <div class="content">
@@ -84,6 +133,14 @@ const { Content } = await post.render();
   .post-meta {
     font-family: monospace;
     color: var(--color-text-muted);
+  }
+
+  .post-updated {
+    display: block;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 0.25rem;
   }
 
   img {
