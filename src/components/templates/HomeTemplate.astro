@@ -19,7 +19,7 @@ const description = "Full-Stack Creative Developer. Design, build, and deploy â€
 const projects = (await getCollection("portfolio"))
   .filter((project) => project.slug.startsWith(`${lang}/`))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+  .slice(0, 6);
 
 const latestPosts = (await getCollection("blog"))
   .filter((post) => post.slug.startsWith(`${lang}/`))
@@ -94,12 +94,14 @@ const latestPosts = (await getCollection("blog"))
               const [, ...slugParts] = project.slug.split('/');
               const slug = slugParts.join('/');
               return (
-                <ProjectCard
-                  title={project.data.title}
-                  description={project.data.description}
-                  tags={project.data.tags}
-                  href={lang === 'en' ? `/portfolio/${slug}` : `/${lang}/portfolio/${slug}`}
-                />
+                <div class="project-card-wrapper">
+                  <ProjectCard
+                    title={project.data.title}
+                    description={project.data.description}
+                    tags={project.data.tags}
+                    href={lang === 'en' ? `/portfolio/${slug}` : `/${lang}/portfolio/${slug}`}
+                  />
+                </div>
               )
             })
           ) : (
@@ -316,9 +318,39 @@ const latestPosts = (await getCollection("blog"))
   }
 
   .project-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    display: flex;
+    overflow-x: auto;
     gap: 2rem;
+    padding-bottom: 1.5rem; /* extra padding for scrollbar */
+    scroll-snap-type: x mandatory;
+  }
+
+  /* Style the scrollbar to look sleek */
+  .project-grid::-webkit-scrollbar {
+    height: 8px;
+  }
+  .project-grid::-webkit-scrollbar-track {
+    background: var(--color-bg-alt);
+    border-radius: 4px;
+  }
+  .project-grid::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+  .project-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+  }
+
+  .project-card-wrapper {
+    flex: 0 0 min(85vw, 350px);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Ensure the inner project-card grows to fill the wrapper height if they differ */
+  .project-card-wrapper > :global(.project-card) {
+    flex: 1;
   }
 
   .empty-state {
