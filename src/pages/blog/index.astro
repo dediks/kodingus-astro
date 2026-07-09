@@ -74,6 +74,18 @@ const posts = (await getCollection('blog')).sort(
 
   .post-list li {
     border-bottom: 1px solid var(--color-border);
+    padding: 0 1rem;
+    margin: 0 -1rem;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  .post-list li:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-text);
+    box-shadow: 4px 4px 0px var(--color-text);
   }
 
   .post-list a {
@@ -81,12 +93,10 @@ const posts = (await getCollection('blog')).sort(
     justify-content: space-between;
     align-items: baseline;
     padding: 1.5rem 0;
-    transition: padding-left 0.2s ease;
+    transition: opacity 0.3s ease;
   }
 
   .post-list a:hover {
-    padding-left: 1rem;
-    background: var(--color-bg-alt);
     text-decoration: none;
     opacity: 1;
   }
