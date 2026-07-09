@@ -36,6 +36,12 @@ const { title, description, href, tags = [] } = Astro.props;
     height: 100%;
   }
 
+  article {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
   .project-card:hover {
     transform: translateY(-5px);
     border-color: var(--color-text);
@@ -54,10 +60,11 @@ const { title, description, href, tags = [] } = Astro.props;
   }
 
   p {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     font-size: 0.95rem;
     line-height: 1.6;
     opacity: 0.9;
+    flex: 1;
   }
 
   .tags {
