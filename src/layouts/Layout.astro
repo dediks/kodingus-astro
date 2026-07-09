@@ -94,6 +94,40 @@ const idUrl = new URL(getAlternateUrl(Astro.url, 'id'), Astro.site ?? Astro.url.
       document.addEventListener("astro:before-swap", (e) => {
         applyTheme(e.newDocument);
       });
+
+      // ── Copy Code Snippet ────────────────────────────────────────────
+      function initCopyButtons() {
+        const blocks = document.querySelectorAll("pre");
+        blocks.forEach((block) => {
+          // ensure not added twice
+          if (block.querySelector(".copy-btn")) return;
+          
+          block.style.position = "relative";
+          const button = document.createElement("button");
+          button.className = "copy-btn";
+          button.innerText = "Copy";
+          
+          button.addEventListener("click", async () => {
+            const code = block.querySelector("code");
+            const text = code ? code.innerText : block.innerText;
+            try {
+              await navigator.clipboard.writeText(text);
+              button.innerText = "Copied!";
+              button.classList.add("copied");
+              setTimeout(() => {
+                button.innerText = "Copy";
+                button.classList.remove("copied");
+              }, 2000);
+            } catch (err) {
+              console.error("Failed to copy:", err);
+            }
+          });
+          
+          block.appendChild(button);
+        });
+      }
+
+      document.addEventListener("astro:page-load", initCopyButtons);
     </script>
     <div class="layout-container">
       <slot />
@@ -175,5 +209,37 @@ const idUrl = new URL(getAlternateUrl(Astro.url, 'id'), Astro.site ?? Astro.url.
   .uppercase {
     text-transform: uppercase;
     letter-spacing: 0.05em;
+  }
+
+  /* Copy Code Button */
+  .copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+    font-family: monospace;
+    font-weight: 700;
+    color: var(--color-bg);
+    background: var(--color-text-muted);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0;
+  }
+  
+  pre:hover .copy-btn {
+    opacity: 1;
+  }
+
+  .copy-btn:hover {
+    background: var(--color-text);
+  }
+
+  .copy-btn.copied {
+    background: #4caf50 !important;
+    color: #fff !important;
+    opacity: 1 !important;
   }
 </style>
