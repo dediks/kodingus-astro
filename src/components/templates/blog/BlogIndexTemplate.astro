@@ -12,16 +12,50 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
-const title = "Blog - Kodingus";
+const title = "Blog | Kodingus";
 const description = "Thoughts on code, AI, and the art of creation.";
 
 const posts = (await getCollection('blog'))
   .filter((post) => post.slug.startsWith(`${lang}/`))
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const blogSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": title,
+  "description": description,
+  "url": Astro.url.href,
+  "author": {
+    "@type": "Person",
+    "@id": "https://kodingus.com/#person",
+    "name": "Dedik",
+    "url": "https://kodingus.com"
+  },
+  "blogPost": posts.map((post) => {
+    const [, ...slugParts] = post.slug.split('/');
+    const slug = slugParts.join('/');
+    const postUrl = new URL(
+      lang === 'en' ? `/blog/${slug}` : `/${lang}/blog/${slug}`,
+      Astro.site ?? Astro.url.origin
+    ).href;
+    return {
+      "@type": "BlogPosting",
+      "headline": post.data.title,
+      "description": post.data.description,
+      "datePublished": post.data.pubDate.toISOString(),
+      "url": postUrl,
+      "author": { "@id": "https://kodingus.com/#person" }
+    };
+  })
+});
 ---
 
 <Layout title={title} description={description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={blogSchema} />
+  </Fragment>
+
   <Header />
+
   
   <main>
     <section>

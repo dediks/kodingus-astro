@@ -13,16 +13,49 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
-const title = "Portfolio - Kodingus";
+const title = "Portfolio | Kodingus";
 const description = "Selected work showcasing engineering, design, and creativity.";
 
 const projects = (await getCollection('portfolio'))
   .filter((project) => project.slug.startsWith(`${lang}/`))
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const portfolioSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": title,
+  "description": description,
+  "url": Astro.url.href,
+  "author": {
+    "@type": "Person",
+    "@id": "https://kodingus.com/#person",
+    "name": "Dedik",
+    "url": "https://kodingus.com"
+  },
+  "hasPart": projects.map((project) => {
+    const [, ...slugParts] = project.slug.split('/');
+    const slug = slugParts.join('/');
+    const projectUrl = new URL(
+      lang === 'en' ? `/portfolio/${slug}` : `/${lang}/portfolio/${slug}`,
+      Astro.site ?? Astro.url.origin
+    ).href;
+    return {
+      "@type": "CreativeWork",
+      "name": project.data.title,
+      "description": project.data.description,
+      "url": projectUrl,
+      "author": { "@id": "https://kodingus.com/#person" }
+    };
+  })
+});
 ---
 
 <Layout title={title} description={description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={portfolioSchema} />
+  </Fragment>
+
   <Header />
+
   
   <main>
     <section>
