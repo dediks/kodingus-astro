@@ -82,6 +82,18 @@ const portfolioSchema = JSON.stringify({
           </p>
         )}
       </div>
+
+      <div class="more-divider">
+        <div class="more-divider-rule"></div>
+        <div class="more-divider-body">
+          <span class="more-divider-label">{t('portfolio.more_label')}</span>
+          <p class="more-divider-text">{t('portfolio.more_coming')}</p>
+        </div>
+        <div class="more-divider-count">
+          <span class="count-number">{projects.length}</span>
+          <span class="count-label">{t('portfolio.shown')}</span>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -109,5 +121,73 @@ const portfolioSchema = JSON.stringify({
     padding: 3rem;
     background: var(--color-bg-alt);
     border-radius: 4px;
+  }
+
+  .more-divider {
+    margin-top: 5rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--color-border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .more-divider-rule {
+    display: none; /* the border-top on parent is the rule */
+  }
+
+  .more-divider-body {
+    flex: 1;
+  }
+
+  .more-divider-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .more-divider-text {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 42ch;
+  }
+
+  .more-divider-count {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+
+  .count-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .count-label {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-top: 0.25rem;
+  }
+
+  @media (max-width: 600px) {
+    .more-divider {
+      flex-direction: column;
+    }
+    .more-divider-count {
+      align-items: flex-start;
+    }
   }
 </style>

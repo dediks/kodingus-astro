@@ -34,6 +34,9 @@ export const ui = {
     'portfolio.back': '← Back to Portfolio',
     'portfolio.visit': 'Visit Project →',
     'portfolio.no_projects': 'No projects found. Check back later!',
+    'portfolio.more_coming': 'More work in progress — this portfolio is actively updated.',
+    'portfolio.more_label': 'More on the way',
+    'portfolio.shown': 'Projects shown',
     
     'about.hidden_title': 'About Dedik — Full-Stack Creative Developer',
     'about.lead': 'From Design to Deployment. I am Dedik, a Full-Stack Creative Developer — your adaptive digital partner.',
@@ -96,6 +99,9 @@ export const ui = {
     'portfolio.back': '← Kembali ke Portofolio',
     'portfolio.visit': 'Kunjungi Proyek →',
     'portfolio.no_projects': 'Belum ada proyek. Cek lagi nanti!',
+    'portfolio.more_coming': 'Masih banyak proyek lainnya yang sedang disiapkan — portofolio ini akan segera diperbarui.',
+    'portfolio.more_label': 'Masih akan bertambah',
+    'portfolio.shown': 'Proyek ditampilkan',
     
     'about.hidden_title': 'Tentang Dedik — Full-Stack Creative Developer',
     'about.lead': 'Dari Desain hingga Deployment. Saya Dedik, Full-Stack Creative Developer — partner digital adaptif Anda.',
