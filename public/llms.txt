@@ -1,0 +1,12 @@
+# Kodingus
+
+> Full-Stack Creative Developer. Design, build, and deploy — all in one.
+
+This website is the personal portfolio and blog of Dedik, a Full-Stack Creative Developer. The content includes articles about software development, web performance, and server management.
+
+## Links
+
+- [Home](https://kodingus.com/)
+- [Blog](https://kodingus.com/blog/)
+- [Portfolio](https://kodingus.com/portfolio/)
+- [Sitemap](https://kodingus.com/sitemap-index.xml)

@@ -14,7 +14,7 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const title = "Kodingus | Full-Stack Creative Developer";
-const description = "Full-Stack Creative Developer. Design, build, and deploy — all in one.";
+const description = t('home.hero.subtitle');
 
 const projects = (await getCollection("portfolio"))
   .filter((project) => project.id.startsWith(`${lang}/`))
@@ -58,7 +58,7 @@ const latestPosts = (await getCollection("blog"))
     <section class="hero">
       <h1 class="hero-title">
         {t('home.hero.title_part1')} <span class="word-cycler" aria-label={t('home.hero.adaptive')}
-          ><span class="word active">{t('home.hero.adaptive')}</span><span class="word"
+          ><span class="word active">{t('home.hero.adaptive')}</span> <span class="word"
             >{t('home.hero.dedicated')}</span
           ></span
         ><br />{t('home.hero.title_part2')}

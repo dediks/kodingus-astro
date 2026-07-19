@@ -5,16 +5,17 @@ import Footer from "../../components/Footer.astro";
 import ServicesHero from "../../components/services/ServicesHero.astro";
 import ServicesList from "../../components/services/ServicesList.astro";
 import ServicesCTA from "../../components/services/ServicesCTA.astro";
+import { useTranslations } from "../../i18n/utils";
 
 interface Props {
     lang: 'en' | 'id';
 }
 
 const { lang } = Astro.props;
+const t = useTranslations(lang);
 
 const title = "Services | Kodingus";
-const description =
-    "Comprehensive digital solutions tailored to your needs. We provide Web Development, UI/UX Design, and Deployment services to elevate your brand.";
+const description = t('services.hero.subtitle');
 
 const schema = JSON.stringify({
     "@context": "https://schema.org/",
