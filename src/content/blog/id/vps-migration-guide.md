@@ -1,30 +1,29 @@
 ---
-title: "Complete VPS Migration Guide: Moving Your Laravel Stack to a New Server"
-description: "A step-by-step guide to migrating a Laravel + PostgreSQL + Nginx stack from one VPS to another — covering source code transfer, database migration, SSL setup, and DNS cutover."
+title: "Memindahkan Stack Laravel ke VPS Baru: Cara yang Benar-Benar Berhasil"
+description: "Panduan praktis migrasi stack Laravel + PostgreSQL + Nginx antar VPS — transfer source code, migrasi database, setup SSL, dan cutover DNS."
 pubDate: 2026-07-06
 heroImage: "/blog/vps-migration-hero.png"
 tags: ["linux", "laravel", "nginx", "postgresql", "devops", "vps"]
 ---
 
-This guide combines all the practical steps for migrating a Laravel + PostgreSQL + Nginx + Node/Vite stack from one VPS (VPS1) to another (VPS2). The safe order of operations is: prepare the destination server, transfer source code, migrate the database, configure the web server, install SSL, test the application, then cut over DNS.
+Sudah beberapa kali melakukan migrasi ini, dan setiap kali selalu ada satu langkah yang terlupa. Makanya ditulis di sini dengan benar: cara memindahkan stack Laravel + PostgreSQL + Nginx + Node/Vite dari satu VPS ke VPS lain tanpa kehilangan data atau menyebabkan downtime yang tidak perlu.
 
-## Overview
+Urutannya lebih penting dari yang kebanyakan orang kira. Cutover DNS sebelum database selesai dipulihkan berarti pengguna melihat situs yang rusak. Menerbitkan sertifikat SSL sebelum Nginx benar-benar melayani port 80 berarti Certbot gagal. Ikuti urutan ini dan sebagian besar masalah bisa dihindari.
 
-The safe migration order for a Laravel + PostgreSQL stack:
+## Urutan Kerja
 
-1. Prepare VPS2.
-2. Transfer source code from VPS1 to VPS2.
-3. Migrate the PostgreSQL database.
-4. Install application dependencies.
-5. Configure Nginx.
-6. Enable SSL with Certbot.
-7. Test the application and database.
-8. Point DNS to VPS2.
-9. Post-cutover verification.
+1. Siapkan VPS2
+2. Transfer source code
+3. Migrasi database PostgreSQL
+4. Install dependency dan konfigurasi Laravel
+5. Konfigurasi Nginx
+6. Terbitkan sertifikat SSL
+7. Uji semuanya
+8. Cutover DNS
 
-## Placeholders
+## Setup Variabel
 
-Customize the following variables before running any commands.
+Isi ini sekali dan pakai sepanjang proses. Menjalankan perintah dengan nilai yang sudah diisi menghindari banyak kesalahan copy-paste.
 
 ```bash
 VPS1_USER=user_vps1
@@ -48,15 +47,15 @@ DB_OLD_OWNER='oldowner'
 DB_OLD_OWNER_PASS='PASSWORD_OLD_OWNER'
 ```
 
-## 1. Prepare VPS2
+## 1. Siapkan VPS2
 
-Make sure VPS2 is accessible via SSH and that core services are available. Setting up the destination server first is the essential first step before files, databases, and DNS are moved.
+SSH ke VPS2 dan pastikan bisa dijangkau dulu sebelum melakukan apapun:
 
 ```bash
 ssh ${VPS2_USER}@${VPS2_IP}
 ```
 
-If the core packages aren't installed yet, install them based on your stack.
+Jika package utama belum terpasang:
 
 ```bash
 sudo apt update
@@ -65,25 +64,25 @@ sudo apt install -y nginx certbot python3-certbot-nginx \
   postgresql postgresql-contrib unzip git curl
 ```
 
-If Node.js isn't available, install the version your project requires.
+Cek juga apakah Node tersedia:
 
 ```bash
 node -v
 npm -v
 ```
 
-## 2. Transfer Source Code from VPS1 to VPS2
+## 2. Transfer Source Code
 
-For source code, `rsync` is the most convenient tool because it can be re-run for incremental syncs. `rsync` is commonly used for file migration between Linux VPS instances because it's efficient and skips files that haven't changed.
+`rsync` adalah tool yang tepat di sini — bisa dilanjutkan kalau terputus, melewati file yang tidak berubah, dan bisa dijalankan berkali-kali.
 
-Create the project folder on VPS2:
+Buat direktori project di VPS2 dulu:
 
 ```bash
 sudo mkdir -p ${PROJECT_PATH}
 sudo chown -R $USER:$USER ${PROJECT_PATH}
 ```
 
-Pull source code from VPS1:
+Lalu tarik semuanya dari VPS1, kecuali folder besar yang akan diinstall ulang:
 
 ```bash
 rsync -avz \
@@ -93,15 +92,15 @@ rsync -avz \
   ${PROJECT_PATH}/
 ```
 
-If you need to copy a single database dump file, use `scp`:
+Kalau hanya perlu menyalin file dump database saja:
 
 ```bash
 scp ${VPS1_USER}@${VPS1_IP}:/tmp/${PROJECT}.dump /tmp/${PROJECT}.dump
 ```
 
-## 3. Set Up Laravel on VPS2
+## 3. Setup Laravel di VPS2
 
-Go into the application folder and install PHP dependencies. Configuring `.env`, file permissions, and clearing config/route/view caches are standard post-migration steps for Laravel.
+Masuk ke folder project, install dependency PHP, dan buat file environment:
 
 ```bash
 cd ${PROJECT_PATH}
@@ -110,7 +109,7 @@ cp .env.example .env
 nano .env
 ```
 
-Minimal `.env` example:
+Kunci yang paling penting untuk diisi dengan benar di `.env`:
 
 ```ini
 APP_ENV=production
@@ -125,7 +124,7 @@ DB_USERNAME=projectdb
 DB_PASSWORD=PASSWORD_DB_VPS2
 ```
 
-Then generate the key and cache Laravel config:
+Generate app key dan rebuild cache:
 
 ```bash
 php artisan key:generate
@@ -135,7 +134,7 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-Set the required Laravel permissions:
+Izin cepat untuk storage dan cache:
 
 ```bash
 sudo chown -R www-data:www-data storage bootstrap/cache
@@ -143,13 +142,11 @@ sudo find storage -type d -exec chmod 775 {} \;
 sudo find bootstrap/cache -type d -exec chmod 775 {} \;
 ```
 
-### 3.1 Best Practices for Storage, Cache, and Log Permissions
+### Soal Permission File
 
-In a Laravel project, permissions aren't just about getting `storage` and `bootstrap/cache` right at the folder level — log files also need to be writable by the user running PHP-FPM or the web server. A safe practice is to ensure the owner and group are consistent, that application process-writable folders are set correctly, and that log files like `storage/logs/laravel.log` are created with the correct owner to avoid `failed to open stream: Permission denied` errors when the app writes logs.
+Di sinilah kebanyakan orang mengalami masalah. Permission di proyek Laravel bukan hanya soal folder `storage` dan `bootstrap/cache` — file log di dalam `storage/logs/` juga perlu bisa ditulis oleh user yang menjalankan PHP-FPM. Kalau salah, akan muncul `failed to open stream: Permission denied` di halaman error Laravel.
 
-The most common recommendation for Nginx + PHP-FPM deployments is to set `www-data` as the group or owner on folders that need write access, especially `storage` and `bootstrap/cache`.
-
-A safe approach:
+Untuk setup Nginx + PHP-FPM, pola yang paling aman adalah menjadikan user deploy sebagai pemilik dan `www-data` sebagai grup, lalu beri akses tulis pada grup di folder yang membutuhkannya:
 
 ```bash
 cd ${PROJECT_PATH}
@@ -165,7 +162,7 @@ sudo find bootstrap/cache -type d -exec chmod 775 {} \;
 sudo find bootstrap/cache -type f -exec chmod 664 {} \;
 ```
 
-If log files don't exist or were created by the wrong user, recreate them with the correct owner:
+Kalau file log belum ada atau dibuat oleh root dari perintah sebelumnya:
 
 ```bash
 sudo mkdir -p storage/logs
@@ -174,15 +171,13 @@ sudo chown $USER:www-data storage/logs/laravel.log
 sudo chmod 664 storage/logs/laravel.log
 ```
 
-If your PHP-FPM process runs as `www-data`, the above pattern lets the application write logs without requiring overly permissive `777` permissions — which should be avoided on production servers.
-
-Check the PHP-FPM pool user if you want to confirm the correct process user:
+Ini menjaga kita dari permission `777`, yang kebiasaan buruk di server production manapun. Untuk memastikan user mana yang dipakai PHP-FPM pool:
 
 ```bash
 grep -E '^(user|group)\s*=' /etc/php/8.4/fpm/pool.d/www.conf
 ```
 
-After changing permissions, reload PHP-FPM and clear the Laravel cache:
+Setelah mengubah permission, selalu reload PHP-FPM dan bersihkan cache:
 
 ```bash
 sudo systemctl reload php8.4-fpm
@@ -190,25 +185,18 @@ php artisan optimize:clear
 php artisan config:cache
 ```
 
-Signs that log permissions are correct:
-- `storage/logs/laravel.log` grows in size as the application is accessed.
-- No `Permission denied` errors on Laravel pages, queues, the scheduler, or Artisan commands.
-- The `storage/framework`, `storage/logs`, and `bootstrap/cache` folders remain writable after subsequent deploys.
+Tanda permission sudah benar: `storage/logs/laravel.log` mulai bertambah ukurannya saat aplikasi diakses, dan tidak ada error permission di output Laravel, queue, maupun perintah Artisan.
 
-## 4. PostgreSQL Database Migration
+## 4. Migrasi Database PostgreSQL
 
-The safest approach for PostgreSQL is to dump on VPS1, copy the dump file to VPS2, then restore. Dump-and-restore is the most common PostgreSQL migration method when moving between machines.
+Cara paling aman adalah dump di VPS1, salin filenya, restore di VPS2. Jangan ambil jalan pintas — mencoba migrasi live membawa risiko yang tidak sebanding.
 
-### 4.1 Check Databases and Roles on VPS1
-
-Log into VPS1 and verify the correct database name and user.
+**Di VPS1 — cek apa yang ada:**
 
 ```bash
 ssh ${VPS1_USER}@${VPS1_IP}
 sudo -u postgres psql
 ```
-
-Inside `psql`:
 
 ```sql
 \l
@@ -216,51 +204,47 @@ Inside `psql`:
 \q
 ```
 
-If needed, check the project's `.env` to confirm which database the application actually uses.
+Cross-check dengan `.env` project kalau tidak yakin database mana yang benar-benar dipakai aplikasi:
 
 ```bash
 cd ${PROJECT_PATH}
 cat .env | grep '^DB_'
 ```
 
-### 4.2 Create a Dump on VPS1
+**Buat dump di VPS1:**
 
-Use the custom format dump so you can restore it with `pg_restore`.
+Gunakan format custom (`-F c`) supaya bisa di-restore dengan `pg_restore`, yang memberi lebih banyak kontrol dibanding dump SQL biasa:
 
 ```bash
 PGPASSWORD='${DB_PASS_VPS1}' \
 pg_dump -U ${DB_USER} -h localhost -d ${DB_NAME} -F c -f /tmp/${PROJECT}.dump
 ```
 
-Verify the dump file:
+Verifikasi file memang ada isinya:
 
 ```bash
 ls -lh /tmp/${PROJECT}.dump
 ```
 
-If you see `permission denied for table ...`, the dump user isn't a full owner or doesn't have sufficient rights. In that case, run the dump with the DB owner or the `postgres` user:
+Kalau muncul `permission denied for table`, user yang dipakai untuk dump tidak memiliki tabel tersebut. Gunakan superuser postgres:
 
 ```bash
 sudo -u postgres pg_dump -d ${DB_NAME} -F c -f /tmp/${PROJECT}.dump
 ```
 
-### 4.3 Copy the Dump to VPS2
-
-From VPS2:
+**Salin dump ke VPS2** (jalankan dari VPS2):
 
 ```bash
 scp ${VPS1_USER}@${VPS1_IP}:/tmp/${PROJECT}.dump /tmp/${PROJECT}.dump
 ```
 
-### 4.4 Create Roles and Database on VPS2
-
-Connect to PostgreSQL on VPS2:
+**Di VPS2 — buat role dan database:**
 
 ```bash
 sudo -u postgres psql
 ```
 
-Create the application user and, if needed, the old owner role from the dump to prevent `role does not exist` errors during restore:
+Buat user aplikasi dan role pemilik lama. Role lama dibutuhkan untuk menghindari error `role does not exist` saat restore:
 
 ```sql
 CREATE ROLE ${DB_USER} LOGIN PASSWORD '${DB_PASS_VPS2}';
@@ -271,22 +255,18 @@ CREATE DATABASE ${DB_NAME} OWNER ${DB_USER};
 \q
 ```
 
-### 4.5 Restore the Dump on VPS2
+**Restore:**
 
 ```bash
 PGPASSWORD='${DB_PASS_VPS2}' \
 pg_restore -U ${DB_USER} -h localhost -d ${DB_NAME} /tmp/${PROJECT}.dump
 ```
 
-### 4.6 Reassign Ownership from Old Role to New Role
-
-Connect to the target database:
+**Bersihkan role lama.** Setelah restore selesai, kepemilikan objek harus dipindah dulu sebelum role bisa di-drop:
 
 ```bash
 sudo -u postgres psql -d ${DB_NAME}
 ```
-
-Then run the standard PostgreSQL ownership transfer sequence:
 
 ```sql
 REASSIGN OWNED BY ${DB_OLD_OWNER} TO ${DB_USER};
@@ -294,9 +274,7 @@ DROP OWNED BY ${DB_OLD_OWNER};
 \q
 ```
 
-### 4.7 Drop the Old Role
-
-After ownership and privileges have been cleaned up, drop the old role:
+Lalu drop:
 
 ```bash
 sudo -u postgres psql
@@ -307,9 +285,9 @@ DROP ROLE ${DB_OLD_OWNER};
 \q
 ```
 
-If `DROP ROLE` still fails, it means objects or privileges remain in one of the databases in the cluster. PostgreSQL documentation recommends running `REASSIGN OWNED` and `DROP OWNED` in every database that the role may have touched before dropping the role.
+Kalau `DROP ROLE` masih complain, berarti role itu punya objek di database lain. Jalankan sequence `REASSIGN OWNED` dan `DROP OWNED` di setiap database yang mungkin pernah disentuh role tersebut.
 
-### 4.8 Verify the Restore
+**Verifikasi restore terlihat benar:**
 
 ```bash
 sudo -u postgres psql -d ${DB_NAME}
@@ -322,11 +300,9 @@ SELECT current_database(), current_user;
 \q
 ```
 
-## 5. Node.js, npm, and Vite Build
+## 5. Node.js dan Frontend Build
 
-If the project uses a frontend build, install dependencies and build. On some projects, `npm install` can fail due to peer dependency conflicts.
-
-Normal steps:
+Kalau project punya langkah build frontend:
 
 ```bash
 cd ${PROJECT_PATH}
@@ -334,7 +310,7 @@ npm install
 npm run build
 ```
 
-If you see `npm ERR! code ERESOLVE`, run with legacy peer deps:
+Kalau `npm install` gagal dengan `npm ERR! code ERESOLVE`, ada konflik versi dependency. Paksa dengan:
 
 ```bash
 rm -rf node_modules package-lock.json
@@ -342,13 +318,13 @@ npm install --legacy-peer-deps
 npm run build
 ```
 
-For a permanent fix, align the versions in `package.json` so dependencies are compatible.
+Solusi permanennya adalah memperbarui `package.json` agar versi dependency kompatibel, tapi `--legacy-peer-deps` bisa buat kita lanjut dulu.
 
-## 6. Configure Nginx for the Main Domain
+## 6. Konfigurasi Nginx
 
-For a new site, start with an HTTP port 80 config first. Writing a `443` block before a certificate exists will cause `nginx -t` to fail because the certificate files don't exist yet.
+Mulai dengan HTTP saja — jangan tulis blok `443` dulu. Certbot perlu menjangkau port 80 untuk verifikasi domain, dan kalau kita referensikan file sertifikat yang belum ada, `nginx -t` akan langsung gagal.
 
-Example `/etc/nginx/sites-available/${PROJECT}`:
+Buat `/etc/nginx/sites-available/${PROJECT}`:
 
 ```nginx
 server {
@@ -382,7 +358,7 @@ server {
 }
 ```
 
-Enable the site:
+Aktifkan dan test:
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/${PROJECT} /etc/nginx/sites-enabled/${PROJECT}
@@ -390,22 +366,22 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-## 7. SSL with Certbot for the Main Domain
+## 7. SSL dengan Certbot
 
-Once Nginx port 80 is active and DNS is pointing to VPS2, create the certificate with Certbot. The `--nginx` plugin will validate the hostname and add the required SSL directives to the Nginx configuration.
+Setelah port 80 aktif dan DNS sudah mengarah ke VPS2, jalankan Certbot:
 
 ```bash
 sudo certbot --nginx -d ${DOMAIN} -d ${WWW_DOMAIN}
 ```
 
-After completion:
+Setelah selesai, test dan reload:
 
 ```bash
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-A clean final config typically uses a canonical non-www redirect like this:
+Versi final config yang bersih biasanya seperti ini — dengan redirect dari www dan plain HTTP:
 
 ```nginx
 server {
@@ -450,20 +426,15 @@ server {
 }
 ```
 
-## 8. Handling Subdomains
+## 8. Subdomain
 
-If you have subdomains like `app.domain.com` or `api.domain.com`, create separate DNS records and Nginx server blocks. The flow remains the same: point DNS to VPS2, enable Nginx port 80, then issue SSL for that hostname.
+Kalau ada subdomain (`app.domain.com`, `api.domain.com`), prosesnya sama persis dengan domain utama — DNS record, config Nginx, sertifikat SSL. Tinggal diulangi per subdomain.
 
-### 8.1 Subdomain DNS Records
+Tambahkan `A` record di DNS provider:
+- `app` → `IP_VPS2`
+- `api` → `IP_VPS2`
 
-Add the following records at your DNS provider:
-
-- `A` record `app` → `IP_VPS2`
-- `A` record `api` → `IP_VPS2`
-
-### 8.2 Separate Subdomain Projects
-
-If the subdomain is a separate project, give it its own folder, `.env`, database, and Nginx config:
+Kalau masing-masing subdomain adalah project terpisah, beri direktori sendiri:
 
 ```bash
 /var/www/main-domain
@@ -471,9 +442,7 @@ If the subdomain is a separate project, give it its own folder, `.env`, database
 /var/www/api-domain
 ```
 
-### 8.3 Nginx for a Subdomain
-
-Example `/etc/nginx/sites-available/app-domain`:
+Config Nginx untuk subdomain mirip dengan domain utama, hanya beda di `server_name` dan `root`:
 
 ```nginx
 server {
@@ -499,41 +468,25 @@ server {
 }
 ```
 
-Enable it:
+Aktifkan, lalu terbitkan SSL:
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/app-domain /etc/nginx/sites-enabled/app-domain
 sudo nginx -t
 sudo systemctl restart nginx
-```
 
-### 8.4 SSL for Subdomains
-
-Issue a certificate just for the subdomain:
-
-```bash
 sudo certbot --nginx -d app.domain.com
 ```
 
-Or include multiple hosts in a single certificate:
+Kalau mau satu sertifikat yang mencakup semuanya sekaligus:
 
 ```bash
 sudo certbot --nginx -d domain.com -d www.domain.com -d app.domain.com -d api.domain.com
 ```
 
-## 9. One Website with Multiple Subdomains (Single Ecosystem)
+## 9. Subdomain yang Berbagi Satu Codebase
 
-This case differs from truly separate subdomain projects. Here, the main domain and several subdomains belong to the same brand or large website — for example, `example.com` as the main domain with `app.example.com` and `api.example.com` as feature subdomains or modules. Infrastructurally, each subdomain must still be treated as its own hostname at the DNS, Nginx, and SSL level, even if they share a codebase or database.
-
-### Architecture Options
-
-Three common patterns:
-
-1. **One codebase, many hostnames** — A single Laravel app serves all hostnames, with routes, middleware, or tenant config differentiating behavior per host.
-2. **One codebase per subdomain** — Each subdomain has its own project folder, even if they share a brand.
-3. **Mixed** — The main domain has its own project; one or two subdomains share a codebase or use separate projects depending on business needs.
-
-### Nginx for One Codebase, Multiple Subdomains
+Kadang domain utama dan subdomain-nya sebenarnya satu aplikasi — codebase sama, database sama, hanya perilakunya berbeda berdasarkan hostname. Dalam kasus ini, semua hostname diarahkan ke root Nginx yang sama.
 
 ```nginx
 server {
@@ -559,9 +512,7 @@ server {
 }
 ```
 
-### SSL for One Domain with Multiple Subdomains
-
-All subdomains that need HTTPS must be included when issuing the certificate:
+SSL perlu mencakup semua hostname:
 
 ```bash
 sudo certbot --nginx \
@@ -571,33 +522,27 @@ sudo certbot --nginx \
   -d api.example.com
 ```
 
-### Laravel Host-Based Routing
-
-A simple example to differentiate behavior based on the incoming host:
+Dan dari sisi Laravel, bisa membedakan perilaku berdasarkan host:
 
 ```php
 $host = request()->getHost();
 
 if ($host === 'app.example.com') {
-    // show app module
+    // tampilkan modul app
 }
 
 if ($host === 'api.example.com') {
-    // show API module
+    // tampilkan modul API
 }
 ```
 
-### Practical Recommendations
+Patokan praktisnya: kalau subdomain hanya berbeda bagian atau modul dari produk yang sama, satu codebase lebih mudah dikelola. Kalau punya tim, database, atau siklus deployment yang berbeda, pisahkan jadi project sendiri.
 
-- If subdomains only differ by page or module, use **one codebase** for lighter maintenance.
-- If each has a separate team, feature set, build, or database, use **separate projects** per subdomain.
-- For SSL, the simplest approach is one certificate covering all hostnames you need in production.
+## 10. Test Sebelum Sentuh DNS
 
-## 10. Final Testing Before Cutover
+Jangan cutover DNS sebelum semuanya dicek di VPS2. Ini kesempatan terakhir menemukan masalah tanpa mempengaruhi traffic live.
 
-Test layer by layer: services, Nginx, HTTPS, Laravel, and PostgreSQL. Thorough testing before the final DNS switch is key to minimizing downtime.
-
-Check services:
+Servis berjalan:
 
 ```bash
 sudo nginx -t
@@ -605,7 +550,7 @@ sudo systemctl status nginx
 sudo systemctl status php8.4-fpm
 ```
 
-Check HTTP and HTTPS:
+HTTP dan HTTPS merespons dengan benar:
 
 ```bash
 curl -I http://${DOMAIN}
@@ -614,7 +559,7 @@ curl -I https://${DOMAIN}
 curl -I https://${WWW_DOMAIN}
 ```
 
-For subdomains:
+Untuk subdomain:
 
 ```bash
 curl -I http://${SUBDOMAIN_APP}
@@ -623,7 +568,7 @@ curl -I http://${SUBDOMAIN_API}
 curl -I https://${SUBDOMAIN_API}
 ```
 
-Check Laravel:
+Aplikasi Laravel sehat:
 
 ```bash
 cd ${PROJECT_PATH}
@@ -631,7 +576,7 @@ php artisan about
 php artisan migrate:status
 ```
 
-Check the database:
+Database terlihat benar:
 
 ```bash
 sudo -u postgres psql -d ${DB_NAME}
@@ -643,41 +588,31 @@ SELECT COUNT(*) FROM users;
 \q
 ```
 
-## 11. DNS Cutover to VPS2
+## 11. Cutover DNS
 
-Once all tests pass, update the A records for the main domain and all subdomains to point to VPS2's IP. After propagation completes, production traffic will land on VPS2 and the migration is complete.
+Perbarui `A` record di DNS provider untuk mengarah ke IP VPS2. Waktu propagasi bervariasi — biasanya hitungan menit, kadang sampai satu jam tergantung TTL yang dikonfigurasi.
 
-If file uploads or storage changed during the transition window, do one more sync before shutting down VPS1:
+Kalau ada file upload atau file storage yang berubah di VPS1 selama proses setup VPS2, lakukan sinkronisasi terakhir sebelum mematikan VPS1:
 
 ```bash
 rsync -avz ${VPS1_USER}@${VPS1_IP}:${PROJECT_PATH}/storage/ ${PROJECT_PATH}/storage/
 rsync -avz ${VPS1_USER}@${VPS1_IP}:${PROJECT_PATH}/public/uploads/ ${PROJECT_PATH}/public/uploads/
 ```
 
-## 12. Troubleshooting Notes
+## Troubleshooting
 
-### PostgreSQL Old Role Cannot Be Dropped
-
-If `DROP ROLE oldowner;` fails due to remaining dependencies, run in every related database:
+**`DROP ROLE` gagal** — Masih ada objek yang dimiliki role tersebut di suatu tempat. Jalankan ini di setiap database yang mungkin pernah disentuh role itu:
 
 ```sql
 REASSIGN OWNED BY oldowner TO newowner;
 DROP OWNED BY oldowner;
 ```
 
-Then:
+Lalu coba `DROP ROLE` lagi.
 
-```sql
-DROP ROLE oldowner;
-```
+**`nginx -t` gagal dengan `fullchain.pem not found`** — Ada blok SSL di config tapi Certbot belum dijalankan. Comment out blok `listen 443 ssl` dan direktif sertifikat, reload Nginx, jalankan Certbot, lalu kembalikan seperti semula.
 
-### Nginx Fails Because SSL Files Don't Exist Yet
-
-If `nginx -t` fails with a `fullchain.pem not found` error, remove the `listen 443 ssl` block or disable SSL directives until Certbot has issued the certificate.
-
-### npm install Fails with ERESOLVE
-
-If frontend dependencies conflict:
+**`npm install` gagal dengan ERESOLVE** — Konflik peer dependency. Jalankan dengan `--legacy-peer-deps`:
 
 ```bash
 rm -rf node_modules package-lock.json
@@ -685,15 +620,15 @@ npm install --legacy-peer-deps
 npm run build
 ```
 
-## 13. Quick Checklist
+## Checklist Cepat
 
-- [ ] VPS2 is ready and core services are installed.
-- [ ] Source code transferred with `rsync`.
-- [ ] PostgreSQL database dumped, copied, and restored.
-- [ ] Old DB ownership transferred to the final user.
-- [ ] Laravel `.env` is correct and caches are refreshed.
-- [ ] Nginx port 80 is active.
-- [ ] Certbot successfully issued certificates for main domain and subdomains.
-- [ ] Frontend build succeeded, including handling of peer dependency conflicts if needed.
-- [ ] Main domain and subdomains pass HTTP/HTTPS tests.
-- [ ] DNS A records for main domain and subdomains point to VPS2.
+- [ ] VPS2 bisa diakses, package utama terpasang
+- [ ] Source code ditransfer dengan `rsync`
+- [ ] Database PostgreSQL di-dump, disalin, dan di-restore
+- [ ] Role lama dibersihkan dan di-drop
+- [ ] `.env` Laravel dikonfigurasi, cache di-rebuild, permission benar
+- [ ] Nginx port 80 aktif
+- [ ] Sertifikat SSL berhasil diterbitkan untuk semua domain dan subdomain
+- [ ] Frontend build selesai
+- [ ] Semua domain lulus test HTTP/HTTPS curl
+- [ ] `A` record DNS diperbarui ke VPS2

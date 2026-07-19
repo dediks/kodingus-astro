@@ -1,30 +1,29 @@
 ---
-title: "Complete VPS Migration Guide: Moving Your Laravel Stack to a New Server"
-description: "A step-by-step guide to migrating a Laravel + PostgreSQL + Nginx stack from one VPS to another — covering source code transfer, database migration, SSL setup, and DNS cutover."
+title: "Moving a Laravel Stack to a New VPS: What Actually Worked"
+description: "A practical walkthrough of migrating a Laravel + PostgreSQL + Nginx stack between two VPS instances — source code transfer, database migration, SSL setup, and DNS cutover."
 pubDate: 2026-07-06
 heroImage: "/blog/vps-migration-hero.png"
 tags: ["linux", "laravel", "nginx", "postgresql", "devops", "vps"]
 ---
 
-This guide combines all the practical steps for migrating a Laravel + PostgreSQL + Nginx + Node/Vite stack from one VPS (VPS1) to another (VPS2). The safe order of operations is: prepare the destination server, transfer source code, migrate the database, configure the web server, install SSL, test the application, then cut over DNS.
+I've done this migration a few times now, and every time I forget at least one step. So here it is written down properly: moving a Laravel + PostgreSQL + Nginx + Node/Vite stack from one VPS to another without losing data or causing unnecessary downtime.
 
-## Overview
+The order matters more than most people realize. Cutting over DNS before the database is restored means your users hit a broken site. Issuing an SSL certificate before Nginx is actually serving port 80 means Certbot fails. Do it in this sequence and you'll avoid most of the pain.
 
-The safe migration order for a Laravel + PostgreSQL stack:
+## The Order of Operations
 
-1. Prepare VPS2.
-2. Transfer source code from VPS1 to VPS2.
-3. Migrate the PostgreSQL database.
-4. Install application dependencies.
-5. Configure Nginx.
-6. Enable SSL with Certbot.
-7. Test the application and database.
-8. Point DNS to VPS2.
-9. Post-cutover verification.
+1. Prepare VPS2
+2. Transfer source code
+3. Migrate the PostgreSQL database
+4. Install dependencies and configure Laravel
+5. Configure Nginx
+6. Issue SSL certificates
+7. Test everything
+8. Cut over DNS
 
-## Placeholders
+## Variable Setup
 
-Customize the following variables before running any commands.
+Fill these in once and use them throughout. Running the commands as-is with actual values avoids a lot of copy-paste errors.
 
 ```bash
 VPS1_USER=user_vps1
@@ -48,15 +47,15 @@ DB_OLD_OWNER='oldowner'
 DB_OLD_OWNER_PASS='PASSWORD_OLD_OWNER'
 ```
 
-## 1. Prepare VPS2
+## 1. Get VPS2 Ready
 
-Make sure VPS2 is accessible via SSH and that core services are available. Setting up the destination server first is the essential first step before files, databases, and DNS are moved.
+SSH into VPS2 and make sure it's actually reachable before doing anything else:
 
 ```bash
 ssh ${VPS2_USER}@${VPS2_IP}
 ```
 
-If the core packages aren't installed yet, install them based on your stack.
+If the core packages aren't installed yet:
 
 ```bash
 sudo apt update
@@ -65,25 +64,25 @@ sudo apt install -y nginx certbot python3-certbot-nginx \
   postgresql postgresql-contrib unzip git curl
 ```
 
-If Node.js isn't available, install the version your project requires.
+Check whether Node is available too:
 
 ```bash
 node -v
 npm -v
 ```
 
-## 2. Transfer Source Code from VPS1 to VPS2
+## 2. Transfer the Source Code
 
-For source code, `rsync` is the most convenient tool because it can be re-run for incremental syncs. `rsync` is commonly used for file migration between Linux VPS instances because it's efficient and skips files that haven't changed.
+`rsync` is the right tool here — it's resumable, skips unchanged files, and you can run it multiple times if the transfer gets interrupted.
 
-Create the project folder on VPS2:
+Create the project directory on VPS2 first:
 
 ```bash
 sudo mkdir -p ${PROJECT_PATH}
 sudo chown -R $USER:$USER ${PROJECT_PATH}
 ```
 
-Pull source code from VPS1:
+Then pull everything over from VPS1, excluding the heavy folders you'll reinstall anyway:
 
 ```bash
 rsync -avz \
@@ -93,7 +92,7 @@ rsync -avz \
   ${PROJECT_PATH}/
 ```
 
-If you need to copy a single database dump file, use `scp`:
+If you only need to copy the database dump file specifically:
 
 ```bash
 scp ${VPS1_USER}@${VPS1_IP}:/tmp/${PROJECT}.dump /tmp/${PROJECT}.dump
@@ -101,7 +100,7 @@ scp ${VPS1_USER}@${VPS1_IP}:/tmp/${PROJECT}.dump /tmp/${PROJECT}.dump
 
 ## 3. Set Up Laravel on VPS2
 
-Go into the application folder and install PHP dependencies. Configuring `.env`, file permissions, and clearing config/route/view caches are standard post-migration steps for Laravel.
+Go into the project folder, install PHP dependencies, and set up the environment file:
 
 ```bash
 cd ${PROJECT_PATH}
@@ -110,7 +109,7 @@ cp .env.example .env
 nano .env
 ```
 
-Minimal `.env` example:
+The critical keys to get right in `.env`:
 
 ```ini
 APP_ENV=production
@@ -125,7 +124,7 @@ DB_USERNAME=projectdb
 DB_PASSWORD=PASSWORD_DB_VPS2
 ```
 
-Then generate the key and cache Laravel config:
+Generate the app key and rebuild the caches:
 
 ```bash
 php artisan key:generate
@@ -135,7 +134,7 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-Set the required Laravel permissions:
+Quick permissions pass for storage and cache:
 
 ```bash
 sudo chown -R www-data:www-data storage bootstrap/cache
@@ -143,13 +142,11 @@ sudo find storage -type d -exec chmod 775 {} \;
 sudo find bootstrap/cache -type d -exec chmod 775 {} \;
 ```
 
-### 3.1 Best Practices for Storage, Cache, and Log Permissions
+### Getting File Permissions Right
 
-In a Laravel project, permissions aren't just about getting `storage` and `bootstrap/cache` right at the folder level — log files also need to be writable by the user running PHP-FPM or the web server. A safe practice is to ensure the owner and group are consistent, that application process-writable folders are set correctly, and that log files like `storage/logs/laravel.log` are created with the correct owner to avoid `failed to open stream: Permission denied` errors when the app writes logs.
+This is where most people run into trouble. Permissions in a Laravel project aren't just about the `storage` and `bootstrap/cache` folders — the log files inside `storage/logs/` also need to be writable by whatever user PHP-FPM runs as. Get this wrong and you'll see `failed to open stream: Permission denied` in your Laravel error pages.
 
-The most common recommendation for Nginx + PHP-FPM deployments is to set `www-data` as the group or owner on folders that need write access, especially `storage` and `bootstrap/cache`.
-
-A safe approach:
+For Nginx + PHP-FPM setups, the safest pattern is to make your deploy user the owner and `www-data` the group, then give the group write access on folders that need it:
 
 ```bash
 cd ${PROJECT_PATH}
@@ -165,7 +162,7 @@ sudo find bootstrap/cache -type d -exec chmod 775 {} \;
 sudo find bootstrap/cache -type f -exec chmod 664 {} \;
 ```
 
-If log files don't exist or were created by the wrong user, recreate them with the correct owner:
+If the log file doesn't exist yet or was created by root during a previous command:
 
 ```bash
 sudo mkdir -p storage/logs
@@ -174,15 +171,13 @@ sudo chown $USER:www-data storage/logs/laravel.log
 sudo chmod 664 storage/logs/laravel.log
 ```
 
-If your PHP-FPM process runs as `www-data`, the above pattern lets the application write logs without requiring overly permissive `777` permissions — which should be avoided on production servers.
-
-Check the PHP-FPM pool user if you want to confirm the correct process user:
+This keeps you away from `777` permissions, which is a bad habit on any production server. To double-check which user your PHP-FPM pool actually runs as:
 
 ```bash
 grep -E '^(user|group)\s*=' /etc/php/8.4/fpm/pool.d/www.conf
 ```
 
-After changing permissions, reload PHP-FPM and clear the Laravel cache:
+After touching permissions, always reload PHP-FPM and clear caches:
 
 ```bash
 sudo systemctl reload php8.4-fpm
@@ -190,25 +185,18 @@ php artisan optimize:clear
 php artisan config:cache
 ```
 
-Signs that log permissions are correct:
-- `storage/logs/laravel.log` grows in size as the application is accessed.
-- No `Permission denied` errors on Laravel pages, queues, the scheduler, or Artisan commands.
-- The `storage/framework`, `storage/logs`, and `bootstrap/cache` folders remain writable after subsequent deploys.
+You'll know permissions are correct when `storage/logs/laravel.log` starts growing as you use the app, and there are no permission errors anywhere in the Laravel output, queues, or Artisan commands.
 
-## 4. PostgreSQL Database Migration
+## 4. Migrate the PostgreSQL Database
 
-The safest approach for PostgreSQL is to dump on VPS1, copy the dump file to VPS2, then restore. Dump-and-restore is the most common PostgreSQL migration method when moving between machines.
+The safest approach is dump on VPS1, copy the file, restore on VPS2. No shortcuts here — skipping the dump and trying to do a live migration introduces risk that isn't worth it.
 
-### 4.1 Check Databases and Roles on VPS1
-
-Log into VPS1 and verify the correct database name and user.
+**On VPS1 — check what you're working with:**
 
 ```bash
 ssh ${VPS1_USER}@${VPS1_IP}
 sudo -u postgres psql
 ```
-
-Inside `psql`:
 
 ```sql
 \l
@@ -216,51 +204,47 @@ Inside `psql`:
 \q
 ```
 
-If needed, check the project's `.env` to confirm which database the application actually uses.
+Cross-reference with the project's `.env` if you're not sure which database the app is actually using:
 
 ```bash
 cd ${PROJECT_PATH}
 cat .env | grep '^DB_'
 ```
 
-### 4.2 Create a Dump on VPS1
+**Create the dump on VPS1:**
 
-Use the custom format dump so you can restore it with `pg_restore`.
+Use the custom format (`-F c`) so you can restore it with `pg_restore`, which gives you more control than a plain SQL dump:
 
 ```bash
 PGPASSWORD='${DB_PASS_VPS1}' \
 pg_dump -U ${DB_USER} -h localhost -d ${DB_NAME} -F c -f /tmp/${PROJECT}.dump
 ```
 
-Verify the dump file:
+Verify the file actually has content:
 
 ```bash
 ls -lh /tmp/${PROJECT}.dump
 ```
 
-If you see `permission denied for table ...`, the dump user isn't a full owner or doesn't have sufficient rights. In that case, run the dump with the DB owner or the `postgres` user:
+If you hit `permission denied for table`, the user you're dumping as doesn't own those tables. Fall back to the postgres superuser:
 
 ```bash
 sudo -u postgres pg_dump -d ${DB_NAME} -F c -f /tmp/${PROJECT}.dump
 ```
 
-### 4.3 Copy the Dump to VPS2
-
-From VPS2:
+**Copy the dump to VPS2** (run this from VPS2):
 
 ```bash
 scp ${VPS1_USER}@${VPS1_IP}:/tmp/${PROJECT}.dump /tmp/${PROJECT}.dump
 ```
 
-### 4.4 Create Roles and Database on VPS2
-
-Connect to PostgreSQL on VPS2:
+**On VPS2 — create the roles and database:**
 
 ```bash
 sudo -u postgres psql
 ```
 
-Create the application user and, if needed, the old owner role from the dump to prevent `role does not exist` errors during restore:
+Create both the app user and the old owner role. The old owner role is needed to avoid `role does not exist` errors when restoring the dump:
 
 ```sql
 CREATE ROLE ${DB_USER} LOGIN PASSWORD '${DB_PASS_VPS2}';
@@ -271,22 +255,18 @@ CREATE DATABASE ${DB_NAME} OWNER ${DB_USER};
 \q
 ```
 
-### 4.5 Restore the Dump on VPS2
+**Restore:**
 
 ```bash
 PGPASSWORD='${DB_PASS_VPS2}' \
 pg_restore -U ${DB_USER} -h localhost -d ${DB_NAME} /tmp/${PROJECT}.dump
 ```
 
-### 4.6 Reassign Ownership from Old Role to New Role
-
-Connect to the target database:
+**Clean up the old owner role.** Once the restore is done, the old role's ownership needs to be transferred before you can drop it:
 
 ```bash
 sudo -u postgres psql -d ${DB_NAME}
 ```
-
-Then run the standard PostgreSQL ownership transfer sequence:
 
 ```sql
 REASSIGN OWNED BY ${DB_OLD_OWNER} TO ${DB_USER};
@@ -294,9 +274,7 @@ DROP OWNED BY ${DB_OLD_OWNER};
 \q
 ```
 
-### 4.7 Drop the Old Role
-
-After ownership and privileges have been cleaned up, drop the old role:
+Then drop it:
 
 ```bash
 sudo -u postgres psql
@@ -307,9 +285,9 @@ DROP ROLE ${DB_OLD_OWNER};
 \q
 ```
 
-If `DROP ROLE` still fails, it means objects or privileges remain in one of the databases in the cluster. PostgreSQL documentation recommends running `REASSIGN OWNED` and `DROP OWNED` in every database that the role may have touched before dropping the role.
+If `DROP ROLE` still complains, the role has objects in another database. Run the `REASSIGN OWNED` and `DROP OWNED` sequence in every database that role might have touched.
 
-### 4.8 Verify the Restore
+**Verify the restore looked right:**
 
 ```bash
 sudo -u postgres psql -d ${DB_NAME}
@@ -322,11 +300,9 @@ SELECT current_database(), current_user;
 \q
 ```
 
-## 5. Node.js, npm, and Vite Build
+## 5. Node.js and the Frontend Build
 
-If the project uses a frontend build, install dependencies and build. On some projects, `npm install` can fail due to peer dependency conflicts.
-
-Normal steps:
+If the project has a frontend build step:
 
 ```bash
 cd ${PROJECT_PATH}
@@ -334,7 +310,7 @@ npm install
 npm run build
 ```
 
-If you see `npm ERR! code ERESOLVE`, run with legacy peer deps:
+If `npm install` dies with `npm ERR! code ERESOLVE`, the dependencies have a version conflict. Force it with:
 
 ```bash
 rm -rf node_modules package-lock.json
@@ -342,13 +318,13 @@ npm install --legacy-peer-deps
 npm run build
 ```
 
-For a permanent fix, align the versions in `package.json` so dependencies are compatible.
+The real fix is updating `package.json` to have compatible versions, but `--legacy-peer-deps` gets you unblocked for now.
 
-## 6. Configure Nginx for the Main Domain
+## 6. Nginx Configuration
 
-For a new site, start with an HTTP port 80 config first. Writing a `443` block before a certificate exists will cause `nginx -t` to fail because the certificate files don't exist yet.
+Start with HTTP only — don't write the `443` block yet. Certbot needs to reach port 80 to verify your domain, and if you reference SSL certificate files that don't exist yet, `nginx -t` will fail.
 
-Example `/etc/nginx/sites-available/${PROJECT}`:
+Create `/etc/nginx/sites-available/${PROJECT}`:
 
 ```nginx
 server {
@@ -382,7 +358,7 @@ server {
 }
 ```
 
-Enable the site:
+Enable and test:
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/${PROJECT} /etc/nginx/sites-enabled/${PROJECT}
@@ -390,22 +366,22 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-## 7. SSL with Certbot for the Main Domain
+## 7. SSL with Certbot
 
-Once Nginx port 80 is active and DNS is pointing to VPS2, create the certificate with Certbot. The `--nginx` plugin will validate the hostname and add the required SSL directives to the Nginx configuration.
+Once port 80 is serving and DNS is pointed at VPS2, run Certbot:
 
 ```bash
 sudo certbot --nginx -d ${DOMAIN} -d ${WWW_DOMAIN}
 ```
 
-After completion:
+After it completes, test and reload:
 
 ```bash
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-A clean final config typically uses a canonical non-www redirect like this:
+Certbot will have modified your Nginx config. A clean final version typically looks like this — with a redirect from www and plain HTTP:
 
 ```nginx
 server {
@@ -450,20 +426,15 @@ server {
 }
 ```
 
-## 8. Handling Subdomains
+## 8. Subdomains
 
-If you have subdomains like `app.domain.com` or `api.domain.com`, create separate DNS records and Nginx server blocks. The flow remains the same: point DNS to VPS2, enable Nginx port 80, then issue SSL for that hostname.
+If you have subdomains (`app.domain.com`, `api.domain.com`), the process is the same as the main domain — DNS record, Nginx config, SSL certificate. Just repeated per subdomain.
 
-### 8.1 Subdomain DNS Records
+Add `A` records at your DNS provider:
+- `app` → `IP_VPS2`
+- `api` → `IP_VPS2`
 
-Add the following records at your DNS provider:
-
-- `A` record `app` → `IP_VPS2`
-- `A` record `api` → `IP_VPS2`
-
-### 8.2 Separate Subdomain Projects
-
-If the subdomain is a separate project, give it its own folder, `.env`, database, and Nginx config:
+If each subdomain is its own separate project, give it its own directory:
 
 ```bash
 /var/www/main-domain
@@ -471,9 +442,7 @@ If the subdomain is a separate project, give it its own folder, `.env`, database
 /var/www/api-domain
 ```
 
-### 8.3 Nginx for a Subdomain
-
-Example `/etc/nginx/sites-available/app-domain`:
+Nginx config for a subdomain looks like the main domain config, just with a different `server_name` and `root`:
 
 ```nginx
 server {
@@ -499,41 +468,25 @@ server {
 }
 ```
 
-Enable it:
+Enable it, then issue SSL:
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/app-domain /etc/nginx/sites-enabled/app-domain
 sudo nginx -t
 sudo systemctl restart nginx
-```
 
-### 8.4 SSL for Subdomains
-
-Issue a certificate just for the subdomain:
-
-```bash
 sudo certbot --nginx -d app.domain.com
 ```
 
-Or include multiple hosts in a single certificate:
+If you want one certificate covering everything at once:
 
 ```bash
 sudo certbot --nginx -d domain.com -d www.domain.com -d app.domain.com -d api.domain.com
 ```
 
-## 9. One Website with Multiple Subdomains (Single Ecosystem)
+## 9. When Subdomains Share a Codebase
 
-This case differs from truly separate subdomain projects. Here, the main domain and several subdomains belong to the same brand or large website — for example, `example.com` as the main domain with `app.example.com` and `api.example.com` as feature subdomains or modules. Infrastructurally, each subdomain must still be treated as its own hostname at the DNS, Nginx, and SSL level, even if they share a codebase or database.
-
-### Architecture Options
-
-Three common patterns:
-
-1. **One codebase, many hostnames** — A single Laravel app serves all hostnames, with routes, middleware, or tenant config differentiating behavior per host.
-2. **One codebase per subdomain** — Each subdomain has its own project folder, even if they share a brand.
-3. **Mixed** — The main domain has its own project; one or two subdomains share a codebase or use separate projects depending on business needs.
-
-### Nginx for One Codebase, Multiple Subdomains
+Sometimes the main domain and its subdomains are really one app — same codebase, same database, just different behavior based on the hostname. In that case, all the hostnames point at the same Nginx root.
 
 ```nginx
 server {
@@ -559,9 +512,7 @@ server {
 }
 ```
 
-### SSL for One Domain with Multiple Subdomains
-
-All subdomains that need HTTPS must be included when issuing the certificate:
+SSL needs to cover all of them:
 
 ```bash
 sudo certbot --nginx \
@@ -571,9 +522,7 @@ sudo certbot --nginx \
   -d api.example.com
 ```
 
-### Laravel Host-Based Routing
-
-A simple example to differentiate behavior based on the incoming host:
+And on the Laravel side, you can branch behavior by host:
 
 ```php
 $host = request()->getHost();
@@ -587,17 +536,13 @@ if ($host === 'api.example.com') {
 }
 ```
 
-### Practical Recommendations
+A quick rule of thumb: if subdomains are just different sections of the same product, one codebase is easier to maintain. If they have separate teams, separate databases, or meaningfully different deployment cycles, keep them as separate projects.
 
-- If subdomains only differ by page or module, use **one codebase** for lighter maintenance.
-- If each has a separate team, feature set, build, or database, use **separate projects** per subdomain.
-- For SSL, the simplest approach is one certificate covering all hostnames you need in production.
+## 10. Test Before Touching DNS
 
-## 10. Final Testing Before Cutover
+Don't cut over DNS until everything checks out on VPS2. This is the last chance to catch something without affecting live traffic.
 
-Test layer by layer: services, Nginx, HTTPS, Laravel, and PostgreSQL. Thorough testing before the final DNS switch is key to minimizing downtime.
-
-Check services:
+Services up:
 
 ```bash
 sudo nginx -t
@@ -605,7 +550,7 @@ sudo systemctl status nginx
 sudo systemctl status php8.4-fpm
 ```
 
-Check HTTP and HTTPS:
+HTTP and HTTPS responding correctly:
 
 ```bash
 curl -I http://${DOMAIN}
@@ -614,7 +559,7 @@ curl -I https://${DOMAIN}
 curl -I https://${WWW_DOMAIN}
 ```
 
-For subdomains:
+Same for subdomains:
 
 ```bash
 curl -I http://${SUBDOMAIN_APP}
@@ -623,7 +568,7 @@ curl -I http://${SUBDOMAIN_API}
 curl -I https://${SUBDOMAIN_API}
 ```
 
-Check Laravel:
+Laravel app healthy:
 
 ```bash
 cd ${PROJECT_PATH}
@@ -631,7 +576,7 @@ php artisan about
 php artisan migrate:status
 ```
 
-Check the database:
+Database looks right:
 
 ```bash
 sudo -u postgres psql -d ${DB_NAME}
@@ -643,41 +588,31 @@ SELECT COUNT(*) FROM users;
 \q
 ```
 
-## 11. DNS Cutover to VPS2
+## 11. DNS Cutover
 
-Once all tests pass, update the A records for the main domain and all subdomains to point to VPS2's IP. After propagation completes, production traffic will land on VPS2 and the migration is complete.
+Update the `A` records at your DNS provider to point at VPS2's IP. Propagation time varies — usually minutes, sometimes up to an hour depending on your TTL settings.
 
-If file uploads or storage changed during the transition window, do one more sync before shutting down VPS1:
+If any file uploads or storage files changed on VPS1 during the time you were setting up VPS2, do one final sync before you shut VPS1 down:
 
 ```bash
 rsync -avz ${VPS1_USER}@${VPS1_IP}:${PROJECT_PATH}/storage/ ${PROJECT_PATH}/storage/
 rsync -avz ${VPS1_USER}@${VPS1_IP}:${PROJECT_PATH}/public/uploads/ ${PROJECT_PATH}/public/uploads/
 ```
 
-## 12. Troubleshooting Notes
+## Troubleshooting
 
-### PostgreSQL Old Role Cannot Be Dropped
-
-If `DROP ROLE oldowner;` fails due to remaining dependencies, run in every related database:
+**`DROP ROLE` fails** — There are still objects owned by that role somewhere. Run this in every database the role might have touched:
 
 ```sql
 REASSIGN OWNED BY oldowner TO newowner;
 DROP OWNED BY oldowner;
 ```
 
-Then:
+Then try `DROP ROLE` again.
 
-```sql
-DROP ROLE oldowner;
-```
+**`nginx -t` fails with `fullchain.pem not found`** — You have an SSL block in your config but Certbot hasn't run yet. Comment out the `listen 443 ssl` block and the certificate directives, reload Nginx, run Certbot, then put them back.
 
-### Nginx Fails Because SSL Files Don't Exist Yet
-
-If `nginx -t` fails with a `fullchain.pem not found` error, remove the `listen 443 ssl` block or disable SSL directives until Certbot has issued the certificate.
-
-### npm install Fails with ERESOLVE
-
-If frontend dependencies conflict:
+**`npm install` fails with ERESOLVE** — Peer dependency conflict. Run with `--legacy-peer-deps`:
 
 ```bash
 rm -rf node_modules package-lock.json
@@ -685,15 +620,15 @@ npm install --legacy-peer-deps
 npm run build
 ```
 
-## 13. Quick Checklist
+## Quick Checklist
 
-- [ ] VPS2 is ready and core services are installed.
-- [ ] Source code transferred with `rsync`.
-- [ ] PostgreSQL database dumped, copied, and restored.
-- [ ] Old DB ownership transferred to the final user.
-- [ ] Laravel `.env` is correct and caches are refreshed.
-- [ ] Nginx port 80 is active.
-- [ ] Certbot successfully issued certificates for main domain and subdomains.
-- [ ] Frontend build succeeded, including handling of peer dependency conflicts if needed.
-- [ ] Main domain and subdomains pass HTTP/HTTPS tests.
-- [ ] DNS A records for main domain and subdomains point to VPS2.
+- [ ] VPS2 accessible, core packages installed
+- [ ] Source code transferred with `rsync`
+- [ ] PostgreSQL database dumped, copied, and restored
+- [ ] Old role cleaned up and dropped
+- [ ] Laravel `.env` configured, caches rebuilt, permissions correct
+- [ ] Nginx port 80 active
+- [ ] SSL certificates issued for all domains and subdomains
+- [ ] Frontend build done
+- [ ] All domains pass HTTP/HTTPS curl tests
+- [ ] DNS `A` records updated to VPS2

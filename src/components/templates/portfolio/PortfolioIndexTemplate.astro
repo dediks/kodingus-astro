@@ -17,7 +17,7 @@ const title = "Portfolio | Kodingus";
 const description = "Selected work showcasing engineering, design, and creativity.";
 
 const projects = (await getCollection('portfolio'))
-  .filter((project) => project.slug.startsWith(`${lang}/`))
+  .filter((project) => project.id.startsWith(`${lang}/`))
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const portfolioSchema = JSON.stringify({
   "@context": "https://schema.org",
@@ -32,7 +32,7 @@ const portfolioSchema = JSON.stringify({
     "url": "https://kodingus.com"
   },
   "hasPart": projects.map((project) => {
-    const [, ...slugParts] = project.slug.split('/');
+    const [, ...slugParts] = project.id.split('/');
     const slug = slugParts.join('/');
     const projectUrl = new URL(
       lang === 'en' ? `/portfolio/${slug}` : `/${lang}/portfolio/${slug}`,
@@ -65,7 +65,7 @@ const portfolioSchema = JSON.stringify({
       <div class="project-grid">
         {projects.length > 0 ? (
           projects.map((project) => {
-            const [, ...slugParts] = project.slug.split('/');
+            const [, ...slugParts] = project.id.split('/');
             const slug = slugParts.join('/');
             return (
               <ProjectCard

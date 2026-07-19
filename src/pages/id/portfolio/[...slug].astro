@@ -4,9 +4,9 @@ import PortfolioPostTemplate from "../../../components/templates/portfolio/Portf
 
 export async function getStaticPaths() {
 	const posts = await getCollection('portfolio');
-  const idPosts = posts.filter(post => post.slug.startsWith('id/'));
+  const idPosts = posts.filter(post => post.id.startsWith('id/'));
 	return idPosts.map((post) => ({
-		params: { slug: post.slug.replace('id/', '') },
+		params: { slug: post.id.replace('id/', '') },
 		props: post,
 	}));
 }

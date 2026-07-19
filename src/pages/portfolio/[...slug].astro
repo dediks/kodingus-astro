@@ -4,9 +4,9 @@ import PortfolioPostTemplate from "../../components/templates/portfolio/Portfoli
 
 export async function getStaticPaths() {
 	const posts = await getCollection('portfolio');
-  const enPosts = posts.filter(post => post.slug.startsWith('en/'));
+  const enPosts = posts.filter(post => post.id.startsWith('en/'));
 	return enPosts.map((post) => ({
-		params: { slug: post.slug.replace('en/', '') },
+		params: { slug: post.id.replace('en/', '') },
 		props: post,
 	}));
 }

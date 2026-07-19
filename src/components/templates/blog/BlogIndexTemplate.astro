@@ -16,7 +16,7 @@ const title = "Blog | Kodingus";
 const description = "Thoughts on code, AI, and the art of creation.";
 
 const posts = (await getCollection('blog'))
-  .filter((post) => post.slug.startsWith(`${lang}/`))
+  .filter((post) => post.id.startsWith(`${lang}/`))
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const blogSchema = JSON.stringify({
   "@context": "https://schema.org",
@@ -31,7 +31,7 @@ const blogSchema = JSON.stringify({
     "url": "https://kodingus.com"
   },
   "blogPost": posts.map((post) => {
-    const [, ...slugParts] = post.slug.split('/');
+    const [, ...slugParts] = post.id.split('/');
     const slug = slugParts.join('/');
     const postUrl = new URL(
       lang === 'en' ? `/blog/${slug}` : `/${lang}/blog/${slug}`,
@@ -65,7 +65,7 @@ const blogSchema = JSON.stringify({
       <ul class="post-list">
         {posts.length > 0 ? (
           posts.map((post) => {
-            const [, ...slugParts] = post.slug.split('/');
+            const [, ...slugParts] = post.id.split('/');
             const slug = slugParts.join('/');
             return (
               <li>

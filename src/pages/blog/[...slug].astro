@@ -4,9 +4,9 @@ import BlogPostTemplate from "../../components/templates/blog/BlogPostTemplate.a
 
 export async function getStaticPaths() {
 	const posts = await getCollection('blog');
-  const enPosts = posts.filter(post => post.slug.startsWith('en/'));
+  const enPosts = posts.filter(post => post.id.startsWith('en/'));
 	return enPosts.map((post) => ({
-		params: { slug: post.slug.replace('en/', '') },
+		params: { slug: post.id.replace('en/', '') },
 		props: post,
 	}));
 }

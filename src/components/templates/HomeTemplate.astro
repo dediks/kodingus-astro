@@ -17,12 +17,12 @@ const title = "Kodingus | Full-Stack Creative Developer";
 const description = "Full-Stack Creative Developer. Design, build, and deploy — all in one.";
 
 const projects = (await getCollection("portfolio"))
-  .filter((project) => project.slug.startsWith(`${lang}/`))
+  .filter((project) => project.id.startsWith(`${lang}/`))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 6);
 
 const latestPosts = (await getCollection("blog"))
-  .filter((post) => post.slug.startsWith(`${lang}/`))
+  .filter((post) => post.id.startsWith(`${lang}/`))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
 ---
@@ -91,7 +91,7 @@ const latestPosts = (await getCollection("blog"))
           projects.length > 0 ? (
             projects.map((project) => {
               // Strip the lang prefix from slug for the link
-              const [, ...slugParts] = project.slug.split('/');
+              const [, ...slugParts] = project.id.split('/');
               const slug = slugParts.join('/');
               return (
                 <div class="project-card-wrapper">
@@ -127,7 +127,7 @@ const latestPosts = (await getCollection("blog"))
         {
           latestPosts.length > 0 ? (
             latestPosts.map((post) => {
-              const [, ...slugParts] = post.slug.split('/');
+              const [, ...slugParts] = post.id.split('/');
               const slug = slugParts.join('/');
               return (
                 <li>
